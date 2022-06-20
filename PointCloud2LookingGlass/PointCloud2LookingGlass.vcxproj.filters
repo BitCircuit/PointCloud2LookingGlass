@@ -31,13 +31,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\log.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="src\README.md">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="src\readPointCloudFile\README.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\log.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\README.md">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
