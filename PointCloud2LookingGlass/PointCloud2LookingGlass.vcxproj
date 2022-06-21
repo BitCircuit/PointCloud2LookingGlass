@@ -23,7 +23,6 @@
     <ClCompile Include="src\readPointCloudFile\plyReader.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\main.h" />
     <ClInclude Include="src\readPointCloudFile\plyReader.h" />
   </ItemGroup>
   <ItemGroup>

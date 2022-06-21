@@ -1,4 +1,5 @@
-#include "../main.h"
+#include "stdbool.h"
+#include "stdint.h"
 
 #define formatAscii     1
 #define formatBinLE     2

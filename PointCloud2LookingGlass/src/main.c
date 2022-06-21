@@ -1,5 +1,6 @@
-#include "main.h"
 #include "readPointCloudFile/plyReader.h"
+
+#include "stdio.h"
 
 void usage() {
     printf("MSc Project - Point Cloud to Light Field Display. Coded by Xiaoao Feng (s2325577) from the University of Edinburgh. Jun 2022\n");
