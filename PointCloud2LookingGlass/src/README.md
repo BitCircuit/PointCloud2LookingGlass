@@ -24,21 +24,21 @@ After multiple attempts of failed built, here is how it's done correctly.
 5. Proceed instruction 2. STOP before step 6.
 6. Follow instruction 3 (Section `CMake Configuration of VTK`)
 
- a. Add flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` to the list.
+ - Add flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` to the list.
  
-  a) Click `Add Entry` (since the flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` will not show in list automatically)
+  -- Click `Add Entry` (since the flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` will not show in list automatically)
 
-  b) Put `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` in Name
+  -- Put `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` in Name
 
-  c) Set Type to `String` (NOT BOOL)
+  -- Set Type to `String` (NOT BOOL)
 
-  d) Set Value to `YES` (ALL CAPITAL LETTERS). DO NOT set it to 'ON' as instructed in instruction 4. 
+  -- Set Value to `YES` (ALL CAPITAL LETTERS). DO NOT set it to 'ON' as instructed in instruction 4. 
 
- b. Set other 2 flags (`VTK_USE_VIDEO_FOR_WINDOWS` and `VTK_USE_MICROSOFT_MEDIA_FOUNDATION`). 
+ - Set other 2 flags (`VTK_USE_VIDEO_FOR_WINDOWS` and `VTK_USE_MICROSOFT_MEDIA_FOUNDATION`). 
 
- c. DO NOT set `VTK_BUILD_TESTING` as instructed in instruction 4 (If set, the building time takes about 45 mins on Intel i7-11800H. If not set, the building time takes about 10 mins.)
+ - DO NOT set `VTK_BUILD_TESTING` as instructed in instruction 4 (If set, the building time takes about 45 mins on Intel i7-11800H. If not set, the building time takes about 10 mins.)
 
- d. DO NOT set `VTK_BUILD_DOCUMENTATION`, or the `Install` process in later procedure may fail. 
+ - DO NOT set `VTK_BUILD_DOCUMENTATION`, or the `Install` process in later procedure may fail. 
 
 7. Back to instruction 2. To avoid redundancy of procedure steps, set the `CMKAE_INSTALL_PREFIX` directory at this step (As instructed in Section `INSTALL`. This is where the final DLL library files stored.). 
 8. Click `Generate`, as instruacted in `instruction 2` - `BUILD SOLUTION` - `Run CMake` - step 7. (Yes, there is no need to do step 6 nor 8)
