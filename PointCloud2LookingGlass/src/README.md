@@ -17,7 +17,7 @@ There are several instructions to follow:
 3. https://github.com/Kitware/LookingGlassVTKModule
 4. https://lookingglassfactory.com/software#vtk
 
-After multiple attempts of failed built, here is how it's done correctly. 
+After multiple attempts of failed built, here is how I successfully build it. 
 1. Follow instruction 3 (Section `Build Requirements`), to allow CMake automatically find the directory of `HoloPlayCore SDK`.
 2. Follow instruction 1, to install other prereqs (Except `Ninja`. It is fast, but it fails while building) and to clone the VTK git repo (STOP before the `Building` section)
 3. Follow instruction 2, proceed from `BUILD SOLUTION` section. STOP before the step 3 in subsection `Run CMake`. 
