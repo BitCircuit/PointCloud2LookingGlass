@@ -26,13 +26,13 @@ After multiple attempts of failed built, here is how it's done correctly.
 
  - Add flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` to the list.
  
-  -- Click `Add Entry` (since the flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` will not show in list automatically)
+  - - Click `Add Entry` (since the flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` will not show in list automatically)
 
-  -- Put `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` in Name
+  - - Put `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` in Name
 
-  -- Set Type to `String` (NOT BOOL)
+  - - Set Type to `String` (NOT BOOL)
 
-  -- Set Value to `YES` (ALL CAPITAL LETTERS). DO NOT set it to 'ON' as instructed in instruction 4. 
+  - - Set Value to `YES` (ALL CAPITAL LETTERS). DO NOT set it to 'ON' as instructed in instruction 4. 
 
  - Set other 2 flags (`VTK_USE_VIDEO_FOR_WINDOWS` and `VTK_USE_MICROSOFT_MEDIA_FOUNDATION`). 
 
