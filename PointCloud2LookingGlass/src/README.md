@@ -27,7 +27,7 @@ After multiple attempts of failed built, here is how I successfully build it.
  - It basically just click `Configure`, and choose the current version of Visual Studio installed on computer. If there isn't, choose the latest version in the list. 
  - Set the flag `CMAKE_CXX_MP_FLAG`.
 6. Follow instruction 3 (Section `CMake Configuration of VTK`)
- - Add flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` to the list (since the flag it will not show in list automatically)
+ - Add flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` to the list (since it is not in the list)
   - - Click `Add Entry`
   - - Name: `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass`, Type: `String` (NOT BOOL), Value: `YES` (ALL CAPITAL LETTERS) DO NOT set it to 'ON' as instructed in instruction 4. 
  - Set other 2 flags (`VTK_USE_VIDEO_FOR_WINDOWS` and `VTK_USE_MICROSOFT_MEDIA_FOUNDATION`). 
