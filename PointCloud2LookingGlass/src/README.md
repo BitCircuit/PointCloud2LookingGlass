@@ -21,7 +21,8 @@ After multiple attempts of failed built, here is how it's done correctly.
 1. Follow instruction 3 (Section `Build Requirements`), to allow CMake automatically find the directory of `HoloPlayCore SDK`.
 2. Follow instruction 1, to install other prereqs (Except `Ninja`. It is fast, but it fails while building) and to clone the VTK git repo (STOP before the `Building` section)
 3. Follow instruction 2, proceed from `BUILD SOLUTION` section. STOP before the step 3 in subsection `Run CMake`. 
-4. Check the box "Advanced" of CMake GUI (just right above the list).
+4. Check the box "Advanced" of CMake GUI as shown in the figure below.
+ ![](CMakeAdvanced.png)
 5. Proceed instruction 2. STOP before step 6.
 6. Follow instruction 3 (Section `CMake Configuration of VTK`)
 
