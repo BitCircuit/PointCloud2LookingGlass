@@ -7,6 +7,7 @@
 #### HoloPlay
 1. HoloPlay Service (Essential service to communicate with the display, download from https://lookingglassfactory.com/software)
 2. Holoplay Core SDK (Need to request from https://lookingglassfactory.com/software) 
+ 
  (Secret: The manufacture somehow makes the "Beta application accepted" webpage fixed at https://lookingglassfactory.com/devtools/holoplay-core, you don't need to login nor request (sad fact: no one resposes to your requests), but you do need a Github account to access it)
 
 ### Build
