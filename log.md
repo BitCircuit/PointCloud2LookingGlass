@@ -47,4 +47,21 @@
 - - 3D images has to be rendered before passing to SDK. Therefore, stopped studying SDK. Switch to VTK. 
 - - Found out VTK has an example to decode PLY file. Switch to VTK. 
 
+#### Jun. 23, 2022
+- Completed:
+- - Changed original code to C++ for easier integrating with VTK
+- - The project is able to plot point cloud image to the display
+
 ### Plan for coming week
+- Create GUI using C++ to control viewing angle of the point cloud image
+- Show 3D animation on the display
+
+## Meeting Jul. 1, 2022
+### Plan for previous week
+- Create GUI using C++ to control viewing angle of the point cloud image
+- Show 3D animation on the display
+### Progress during previous week
+
+
+### Plan for coming week
+- Plot live stream video captured by depth camera on the display
