@@ -12,7 +12,7 @@
 ### Plan for coming week
 - Plot point cloud image on the display
 
-## Meeting Jun. 24, 2022
+## Meeting Jun. 23, 2022
 ### Plan for previous week
 - Plot point cloud image on the display
 ### Progress during previous week
@@ -33,11 +33,11 @@
 
 #### Jun. 20, 2022
 - Made progress:
-- - Studying HoloPlay SDK; 50% complete. Found the data port. May import decoded PLY data from `readPLY` to this function to test. 
+- - Studying HoloPlay SDK; 50% complete. Found the entry function to generate 3D model dataset and start processing. May import decoded PLY data from `readPLY` to this function to test. 
 - Encountered problem:
-- - Requirement from official documents states my data should be pre-rendered before using the SDK. 3D rendering may exceed my coding ability. Looking for open source library. 
+- - Found out my data should be pre-rendered before using the SDK (Stated in official documentation). 3D rendering may exceed my coding ability. Looking for open source library. 
 
-#### Jun. 23, 2022
+#### Jun. 22, 2022
 - Completed:
 - - Successfully built VTK (an open source C++ library to render 3D Image, and integrated with HoloPlay SDK to output to the display)
 - - Wrote instruction to build VTK (since there are 4 cross-referencing official documentations (they have errors as well))
