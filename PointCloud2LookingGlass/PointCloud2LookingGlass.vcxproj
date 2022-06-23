@@ -30,7 +30,7 @@
     <None Include="..\README.md" />
     <None Include="src\README.md" />
     <None Include="src\readPointCloudFile\README.md" />
-    <None Include="src\VTKBuildingInstruction.md" />
+    <None Include="src\vtkHandler\VTKBuildingInstruction.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

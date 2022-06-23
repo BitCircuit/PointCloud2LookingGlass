@@ -46,3 +46,51 @@ After multiple attempts of failed built, here is how I successfully build it.
 7. Right click	`INSTALL` project and click	`build`. 
 8. Add the subdirectory `\bin` in the path set in step 7 (flag `CMKAE_INSTALL_PREFIX`) into System Environment Path. May need reboot the computer to make it effective. 
 9. Follow `TEST WITH AN EXAMPLE` section to test the build. 
+
+## Usage
+For features (reading PLY file and displaying on the Looking Glass), here are the `.lib` files to include in Dependencies of your chosen IDE (In Visual Studio, [your project] - 'Property' - 'Linker' - 'Input' - 'Additional Dependencies'). 
+ This list should solve most of `unsolved symbol` errors while building own project. Please do note: I installed VTK in my `D:\Program Files (x86)\VTK`. Please adjust the path according to your circumstances. 
+```
+D:\Program Files (x86)\VTK\lib\vtkRenderingLookingGlass-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkIOPLY-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkInteractionStyle-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkRenderingContextOpenGL2-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkRenderingGL2PSOpenGL2-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkRenderingOpenGL2-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkIOCore-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkRenderingContext2D-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkRenderingFreeType-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkfreetype-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkRenderingHyperTreeGrid-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkRenderingUI-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkRenderingCore-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkCommonColor-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkFiltersGeneral-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkFiltersCore-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkCommonExecutionModel-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkCommonDataModel-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkCommonTransforms-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkCommonMisc-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkglew-9.2d.lib
+opengl32.lib
+D:\Program Files (x86)\VTK\lib\vtkCommonMath-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkCommonCore-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtksys-9.2d.lib
+ws2_32.lib
+dbghelp.lib
+psapi.lib
+D:\Program Files (x86)\VTK\lib\vtkkissfft-9.2d.lib
+D:\Program Files (x86)\VTK\lib\vtkzlib-9.2d.lib
+kernel32.lib
+user32.lib
+gdi32.lib
+winspool.lib
+shell32.lib
+ole32.lib
+oleaut32.lib
+uuid.lib
+comdlg32.lib
+advapi32.lib
+D:\Program Files (x86)\VTK\lib\vtkTestingRendering-9.2d.lib
+```
+One more thing: Copy HoloPlayCore.dll to the directory where preject's excutable file built. 

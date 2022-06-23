@@ -37,10 +37,10 @@
     <None Include="..\README.md">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="src\VTKBuildingInstruction.md">
+    <None Include="src\README.md">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="src\README.md">
+    <None Include="src\vtkHandler\VTKBuildingInstruction.md">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
