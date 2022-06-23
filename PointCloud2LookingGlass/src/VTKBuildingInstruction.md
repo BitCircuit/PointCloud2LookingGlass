@@ -1,5 +1,5 @@
-# Integrating with VTK (open source C++ library integrated ability of 3D rendering with supportibility to the Looking Glass (the Light Field Display))
-## Build and Install (Windows tutorial only.. so far.. may test on macOS/Linux and update this README)
+# Integrating with VTK
+## Build and Install (Windows tutorial only. May test on macOS/Linux and update this README)
 ### Prereq
 1. Visual Studio Community (not Visual Studio Code)
 2. CMake (recommended with GUI (Graphical User Interface))

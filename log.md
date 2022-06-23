@@ -30,10 +30,16 @@
 - Made progress:
 - - Studying HoloPlay SDK; 10% complete
 
+#### Jun. 20, 2022
+- Made progress:
+- - Studying HoloPlay SDK; 50% complete. Found the data port. May import decoded PLY data from `readPLY` to this function to test. 
+- Encountered problem:
+- - Requirement from official documents states my data should be pre-rendered before using the SDK. 3D rendering may exceed my coding ability. Looking for open source library. 
+
 #### Jun. 23, 2022
 - Completed:
 - - Successfully built VTK (an open source C++ library to render 3D Image, and integrated with HoloPlay SDK to output to the display)
-- - Wrote instruction README.md of building VTK (since there is not any strightforward instruction provided)
+- - Wrote instruction to build VTK (since there are 4 cross-referencing official documentations (they have errors as well))
 - Made progress:
 - - Studying VTK; 10% complete
 - Encountered problem:
