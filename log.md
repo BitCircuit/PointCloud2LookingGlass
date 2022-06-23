@@ -8,7 +8,7 @@
 - Make final decision on project topic: Light Field Display, or Gesture Recognation, or SLAM
 ### Progress during previous week
 - Completed: 
-- - Researched on principle, applications and marketing value of the Light Field Display
+- - Researched on principle, industrial applications of the Light Field Display
 ### Plan for coming week
 - Plot point cloud image on the display
 
