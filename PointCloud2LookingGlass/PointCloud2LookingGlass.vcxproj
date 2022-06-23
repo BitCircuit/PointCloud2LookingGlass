@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\readPointCloudFile\plyReader.c" />
+    <ClCompile Include="src\vtkHandler\vtkHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\readPointCloudFile\plyReader.h" />
+    <ClInclude Include="src\vtkHandler\vtkHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\log.md" />
@@ -90,10 +92,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\Program Files %28x86%29\VTK\include\vtk-9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>D:\Program Files (x86)\VTK\lib\vtkRenderingLookingGlass-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkIOPLY-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkInteractionStyle-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingContextOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingGL2PSOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkIOCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingContext2D-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingFreeType-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkfreetype-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingHyperTreeGrid-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingUI-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonColor-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkFiltersGeneral-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkFiltersCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonExecutionModel-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonDataModel-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonTransforms-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonMisc-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkglew-9.2d.lib;opengl32.lib;D:\Program Files (x86)\VTK\lib\vtkCommonMath-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtksys-9.2d.lib;ws2_32.lib;dbghelp.lib;psapi.lib;D:\Program Files (x86)\VTK\lib\vtkkissfft-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkzlib-9.2d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;D:\Program Files (x86)\VTK\lib\vtkTestingRendering-9.2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -104,12 +108,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\Program Files %28x86%29\VTK\include\vtk-9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>D:\Program Files (x86)\VTK\lib\vtkRenderingLookingGlass-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkIOPLY-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkInteractionStyle-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingContextOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingGL2PSOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkIOCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingContext2D-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingFreeType-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkfreetype-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingHyperTreeGrid-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingUI-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonColor-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkFiltersGeneral-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkFiltersCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonExecutionModel-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonDataModel-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonTransforms-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonMisc-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkglew-9.2d.lib;opengl32.lib;D:\Program Files (x86)\VTK\lib\vtkCommonMath-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtksys-9.2d.lib;ws2_32.lib;dbghelp.lib;psapi.lib;D:\Program Files (x86)\VTK\lib\vtkkissfft-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkzlib-9.2d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;D:\Program Files (x86)\VTK\lib\vtkTestingRendering-9.2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,10 +124,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\Program Files %28x86%29\VTK\include\vtk-9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>D:\Program Files (x86)\VTK\lib\vtkRenderingLookingGlass-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkIOPLY-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkInteractionStyle-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingContextOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingGL2PSOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkIOCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingContext2D-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingFreeType-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkfreetype-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingHyperTreeGrid-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingUI-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonColor-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkFiltersGeneral-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkFiltersCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonExecutionModel-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonDataModel-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonTransforms-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonMisc-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkglew-9.2d.lib;opengl32.lib;D:\Program Files (x86)\VTK\lib\vtkCommonMath-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtksys-9.2d.lib;ws2_32.lib;dbghelp.lib;psapi.lib;D:\Program Files (x86)\VTK\lib\vtkkissfft-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkzlib-9.2d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;D:\Program Files (x86)\VTK\lib\vtkTestingRendering-9.2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -132,12 +140,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\Program Files %28x86%29\VTK\include\vtk-9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>D:\Program Files (x86)\VTK\lib\vtkRenderingLookingGlass-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkIOPLY-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkInteractionStyle-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingContextOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingGL2PSOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingOpenGL2-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkIOCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingContext2D-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingFreeType-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkfreetype-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingHyperTreeGrid-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingUI-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkRenderingCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonColor-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkFiltersGeneral-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkFiltersCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonExecutionModel-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonDataModel-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonTransforms-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonMisc-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkglew-9.2d.lib;opengl32.lib;D:\Program Files (x86)\VTK\lib\vtkCommonMath-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkCommonCore-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtksys-9.2d.lib;ws2_32.lib;dbghelp.lib;psapi.lib;D:\Program Files (x86)\VTK\lib\vtkkissfft-9.2d.lib;D:\Program Files (x86)\VTK\lib\vtkzlib-9.2d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;D:\Program Files (x86)\VTK\lib\vtkTestingRendering-9.2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

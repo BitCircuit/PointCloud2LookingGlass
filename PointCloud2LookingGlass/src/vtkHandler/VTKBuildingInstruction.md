@@ -93,4 +93,6 @@ comdlg32.lib
 advapi32.lib
 D:\Program Files (x86)\VTK\lib\vtkTestingRendering-9.2d.lib
 ```
-One more thing: Copy HoloPlayCore.dll to the directory where preject's excutable file built. 
+Also, set include directory of your chosen IDE (In Visual Studio, [your project] - 'Property' - 'C/C++' - 'General' - 'Additional Include Directory'): D:\Program Files (x86)\VTK\include\vtk-9.2
+
+After building, copy HoloPlayCore.dll to the directory where preject's excutable file built. 

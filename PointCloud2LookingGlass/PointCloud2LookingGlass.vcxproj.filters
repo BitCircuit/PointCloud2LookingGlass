@@ -15,15 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.c">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\readPointCloudFile\plyReader.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\vtkHandler\vtkHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\readPointCloudFile\plyReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vtkHandler\vtkHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
