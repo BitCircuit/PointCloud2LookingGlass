@@ -1,6 +1,6 @@
 # About the project
 ## Point Cloud Image Common File Format
-- PLY file. Please refer to this [README.md](readPointCloudFile/README.md)
+- PLY file. Please refer to this [README.md](/readPointCloudFile)
 - PCD file. 
 
 ## External Components
