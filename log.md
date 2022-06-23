@@ -38,5 +38,6 @@
 - - Studying VTK; 10% complete
 - Encountered problem:
 - - 3D images has to be rendered before passing to SDK. Therefore, stopped studying SDK. Switch to VTK. 
+- - Found out VTK has an example to decode PLY file. Switch to VTK. 
 
 ### Plan for coming week
