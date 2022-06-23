@@ -8,7 +8,7 @@
 1. HoloPlay Service (Essential service to communicate with the display, download from https://lookingglassfactory.com/software)
 2. Holoplay Core SDK (Need to request from https://lookingglassfactory.com/software) 
  
- (Secret: The manufacture somehow makes the "Beta application accepted" webpage fixed at https://lookingglassfactory.com/devtools/holoplay-core, no need to login nor request (sad fact: no one resposes to the request), but a Github account is required to access it)
+ (Secret: The manufacture somehow makes the "Beta application accepted" webpage fixed at https://lookingglassfactory.com/devtools/holoplay-core, no need to login nor request (sad fact: no one responded to my request), but a Github account is required to access it)
 
 ### Build
 There are several instructions to follow:
@@ -24,7 +24,7 @@ After multiple attempts of failed built, here is how I successfully build it.
 4. Check the box "Advanced" of CMake GUI as shown in the figure below.
  ![](CMakeAdvanced.png)
 5. Proceed instruction 2. STOP before step 6.
- - It basically just click `Configure`, and choose the current version of Visual Studio installed on computer. If there isn't, choose the latest version in the list. 
+ - It basically just click `Configure`, and choose the current version of Visual Studio installed on computer. If it is not shown, choose the latest version in the list. 
  - Set the flag `CMAKE_CXX_MP_FLAG`.
 6. Follow instruction 3 (Section `CMake Configuration of VTK`)
  - Add flag `VTK_MODULE_ENABLE_VTK_RenderingLookingGlass` to the list (since it is not in the list)
