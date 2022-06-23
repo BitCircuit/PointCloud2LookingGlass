@@ -30,4 +30,13 @@
 - Made progress:
 - - Studying HoloPlay SDK; 10% complete
 
+#### Jun. 23, 2022
+- Completed:
+- - Successfully built VTK (an open source C++ library to render 3D Image, and integrated with HoloPlay SDK to output to the display)
+- - Wrote instruction README.md of building VTK (since there is not any strightforward instruction provided)
+- Made progress:
+- - Studying VTK; 10% complete
+- Encountered problem:
+- - 3D images has to be rendered before passing to SDK. Therefore, stopped studying SDK. Switch to VTK. 
+
 ### Plan for coming week
