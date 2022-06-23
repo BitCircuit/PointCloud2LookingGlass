@@ -1,6 +1,6 @@
 # About the project
 ## Point Cloud Image Common File Format
-- PLY file. Please refer to this [README.md](readPointCloudFile)
+- PLY file. Please refer to subdirectory [readPointCloudFile](readPointCloudFile)
 - - Later found out the VTK has built in function to read PLY file. May abandon this code. 
 - PCD file. 
 
