@@ -28,6 +28,7 @@
   <ItemGroup>
     <None Include="..\log.md" />
     <None Include="..\README.md" />
+    <None Include="src\README.md" />
     <None Include="src\readPointCloudFile\README.md" />
     <None Include="src\VTKBuildingInstruction.md" />
   </ItemGroup>
