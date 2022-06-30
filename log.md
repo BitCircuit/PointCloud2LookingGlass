@@ -61,7 +61,26 @@
 - Create GUI using C++ to control viewing angle of the point cloud image
 - Show 3D animation on the display
 ### Progress during previous week
+#### Jun. 24, 2022
+- Made progress:
+- - Study QT (a framework based on C++, to create GUI for applications with cross-platform ability)
+- - Study wxWidget (a C++ library to create GUI for applicaitons)
 
+#### Jun. 27, 2022
+- Made progress:
+- - Study QT. Try to add gamepad controller support as it would be more fun to younger students to learn this project
+
+#### Jun. 29, 2022
+- Made progress:
+- - Study QT. 
+- - Try to make a loop in `vtkHandler` for user input to change view direction of the 3D model. 
+- Encountered problem:
+- - Render window becomes unresponsive after a few loops. Worried about animation possibility. Need to study the rendering process.
+
+#### Jun. 30, 2022
+- Made progress:
+- - Study VTK APIs. 
 
 ### Plan for coming week
-- Plot live stream video captured by depth camera on the display
+- Continue to create GUI
+- Make 3D model controlable, then show 3D animation frame by frame on the display

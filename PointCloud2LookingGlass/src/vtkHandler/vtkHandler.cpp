@@ -15,6 +15,17 @@
 #include "vtkTestUtilities.h"
 #include "vtkTextureObject.h"
 #include "stdio.h"
+#include "conio.h"
+
+// Keyboard value (US)
+#define arrowUp     38
+#define arrowDown   40
+#define arrowLeft   37
+#define arrowRight  39
+#define KEY_ESC     27
+
+// Some variables
+double cameraHorizontalAngle = 0.0, cameraVerticalAngle = 0.0, cameraScale = 1.0;
 
 //------------------------------------------------------------------------------
 int vtkHandler(int argc, char* argv[])
@@ -23,8 +34,8 @@ int vtkHandler(int argc, char* argv[])
     renderer->SetBackground(0.3, 0.4, 0.6);
     vtkNew<vtkRenderWindow> renderWindow;
     renderWindow->AddRenderer(renderer);
-    vtkNew<vtkRenderWindowInteractor> iren;
-    iren->SetRenderWindow(renderWindow);
+    //vtkNew<vtkRenderWindowInteractor> iren;
+    //iren->SetRenderWindow(renderWindow);
 
     char* fileName = argv[2];// vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/dragon.ply");
     vtkNew<vtkPLYReader> reader;
@@ -66,23 +77,71 @@ int vtkHandler(int argc, char* argv[])
     vtkOpenGLRenderer* glrenderer = vtkOpenGLRenderer::SafeDownCast(renderer);
     glrenderer->SetPass(lgpass);
 
-    renderer->GetActiveCamera()->SetPosition(0, 0, 1);
-    renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
-    renderer->GetActiveCamera()->SetViewUp(0, 1, 0);
-    renderer->ResetCamera();
-    renderer->GetActiveCamera()->Azimuth(45.0);
-    //renderer->GetActiveCamera()->SetRoll(45.0);
-    //renderer->GetActiveCamera()->SetParallelScale(10);
-    renderer->GetActiveCamera()->Zoom(1.0);
-    renderWindow->Render();
+    int retVal = 0;
 
-    int retVal = vtkRegressionTestImageThreshold(renderWindow, 15);
-    if (retVal == vtkRegressionTester::DO_INTERACTOR)
-    {
-        iren->Start();
+    //while(1) {
+        renderer->GetActiveCamera()->SetPosition(0, 0, 1);
+        renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
+        renderer->GetActiveCamera()->SetViewUp(0, 1, 0);
+        renderer->ResetCamera();
+    while (1) {
+        renderer->GetActiveCamera()->Azimuth(cameraHorizontalAngle);
+        renderer->GetActiveCamera()->Pitch(cameraVerticalAngle);
+        //renderer->GetActiveCamera()->SetRoll(45.0);
+        //renderer->GetActiveCamera()->SetParallelScale(10);
+        renderer->GetActiveCamera()->Zoom(cameraScale);
+        renderWindow->Render();
+
+        // Reset values after they are used
+        cameraVerticalAngle = 0.0;
+        cameraHorizontalAngle = 0.0;
+        cameraScale = 1.0;
+
+        //retVal = vtkRegressionTestImageThreshold(renderWindow, 15);
+        //if (retVal == vtkRegressionTester::DO_INTERACTOR)
+        {
+            //iren->Start();
+        }
+        
+        switch (char operation = getch()) {
+        case 'w':
+            cameraVerticalAngle += 5;
+            printf("Turning up. %f\n", cameraVerticalAngle);
+            break;
+        case 's':
+            cameraVerticalAngle -= 5;
+            printf("Turning down. %f\n", cameraVerticalAngle);
+            break;
+        case 'a':
+            cameraHorizontalAngle -= 5;
+            printf("Turning left. %f\n", cameraHorizontalAngle);
+            break;
+        case 'd':
+            cameraHorizontalAngle += 5;
+            printf("Turning right. %f\n", cameraHorizontalAngle);
+            break;
+        case 'e':
+            cameraScale += 0.5;
+            printf("Zooming In. %f\n", cameraScale);
+            break;
+        case 'q':
+            cameraScale -= 0.5;
+            printf("Zooming Out. %f\n", cameraScale);
+            break;
+        case 'r':
+            cameraVerticalAngle = 0.0;
+            cameraHorizontalAngle = 0.0;
+            cameraScale = 1.0;
+            printf("Resetting Camera. \n");
+            renderer->ResetCamera();
+            break;
+        default:
+            goto exit_loop;
+        }
+        //renderWindow->ReleaseCurrent();
+        renderer->ResetCamera();
     }
-    char dummy[2];
-    printf("Press any key to exit...");
-    scanf("%1s", dummy);
+exit_loop:
+    printf("Job is done. \n");
     return !retVal;
 }
