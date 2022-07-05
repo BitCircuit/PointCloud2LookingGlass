@@ -120,7 +120,7 @@ int vtkHandler(int argc, char* argv[])
         //retVal = vtkRegressionTestImageThreshold(renderWindow, 15);
         //if (retVal == vtkRegressionTester::DO_INTERACTOR)
         {
-            //iren->Start();
+            iren->Start();
         }
         
         switch (char operation = getch()) {
