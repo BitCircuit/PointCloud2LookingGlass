@@ -82,5 +82,27 @@
 - - Study VTK APIs. 
 
 ### Plan for coming week
-- Continue to create GUI
-- Make 3D model controlable, then show 3D animation frame by frame on the display
+- Debugging Code (Fix horizontal angle controlling)
+
+## Meeting Jul. 8, 2022
+### Plan for previous week
+- Debugging Code (Fix horizontal angle controlling)
+
+### Progress during previous week
+#### Jul. 1, 2022
+- Completed:
+- - Fixed screen frozen problem by calling `renderWindow->Finalize()`
+- Encountered problem:
+- - Rendering process takes long time; Seek solution from VTK's guide.
+
+#### Jul. 4, 2022
+- Completed:
+- - Found out the path from 3D camera to display: Intel RealSense Camera -> camera's SDK `rs-pointcloud` -> Point Cloud Library -> VTK -> Looking Glass SDK -> Looking Glass Display
+- Made progress:
+- - Building Environment for Point Cloud Library; 20%. Installing prereq; 30%
+- Encountered problem:
+- - Point Cloud Library has a mandatary prereq `FLANN` which no longer been maintainanced. Looking for other ways to build. 
+
+#### Jul. 5, 2022
+
+### Plan for coming week
