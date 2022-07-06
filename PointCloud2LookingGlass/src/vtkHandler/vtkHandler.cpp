@@ -32,10 +32,8 @@ int vtkHandler(int argc, char* argv[])
 {
     vtkNew<vtkRenderer> renderer;
     renderer->SetBackground(0.3, 0.4, 0.6);
-    //vtkNew<vtkRenderWindow> renderWindow;
-    //renderWindow->AddRenderer(renderer);
-    //vtkNew<vtkRenderWindowInteractor> iren;
-    //iren->SetRenderWindow(renderWindow);
+    vtkNew<vtkRenderWindow> renderWindow;
+    renderWindow->AddRenderer(renderer);
 
     char* fileName = argv[2];// vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/dragon.ply");
     vtkNew<vtkPLYReader> reader;
@@ -52,7 +50,7 @@ int vtkHandler(int argc, char* argv[])
     renderer->AddActor(actor);
 
     // For anti-alising
-    //renderWindow->SetMultiSamples(8);
+    renderWindow->SetMultiSamples(8);
 
     // create the basic VTK render steps
     vtkNew<vtkRenderStepsPass> basicPasses;
@@ -65,7 +63,6 @@ int vtkHandler(int argc, char* argv[])
     lgpass->SetDelegatePass(basicPasses);
 
     // setup the window based on information from looking glass
-    /*
     int w, h;
     lgpass->GetInterface()->GetDisplaySize(w, h);
     renderWindow->SetSize(w, h);
@@ -73,56 +70,27 @@ int vtkHandler(int argc, char* argv[])
     lgpass->GetInterface()->GetDisplayPosition(x, y);
     renderWindow->SetPosition(x, y);
     renderWindow->BordersOff();
-    */
-    
 
     // tell the renderer to use our render pass pipeline
     vtkOpenGLRenderer* glrenderer = vtkOpenGLRenderer::SafeDownCast(renderer);
     glrenderer->SetPass(lgpass);
 
-    int retVal = 0;
-
-    vtkNew<vtkRenderWindow> renderWindow;
-    renderWindow->AddRenderer(renderer);
-    vtkNew<vtkRenderWindowInteractor> iren;
-    iren->SetRenderWindow(renderWindow);
-    int w, h;
-    lgpass->GetInterface()->GetDisplaySize(w, h);
-    renderWindow->SetSize(w, h);
-    int x, y;
-    lgpass->GetInterface()->GetDisplayPosition(x, y);
-    renderWindow->SetPosition(x, y);
-    renderWindow->BordersOff();
-    renderWindow->SetMultiSamples(8);
-
-    //while(1) {
-        renderer->GetActiveCamera()->SetPosition(0, 0, 1);
-        renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
-        renderer->GetActiveCamera()->SetViewUp(0, 1, 0);
-        //renderer->GetActiveCamera()->SetViewAngle(20.0);        // Default: 30 degree. Reference: https://docs.lookingglassfactory.com/keyconcepts/camera#view-cone
-        renderer->ResetCamera();
+    renderer->GetActiveCamera()->SetPosition(1, 0, 0);
+    renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
+    renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
+    renderer->ResetCamera();
     while (1) {
         renderer->GetActiveCamera()->Azimuth(cameraHorizontalAngle);
-        renderer->GetActiveCamera()->Pitch(cameraVerticalAngle);
-        //renderer->GetActiveCamera()->SetRoll(45.0);
-        //renderer->GetActiveCamera()->SetParallelScale(10);
+        renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
+        renderer->GetActiveCamera()->OrthogonalizeViewUp();
         renderer->GetActiveCamera()->Zoom(cameraScale);
-        renderWindow->Finalize();       // Finalize the previous render
-        //renderWindow->CopyResultFrame();
         renderWindow->Render();
-        //renderWindow->Finalize();       // Finalize the previous render
 
         // Reset values after they are used
         cameraVerticalAngle = 0.0;
         cameraHorizontalAngle = 0.0;
         cameraScale = 1.0;
 
-        //retVal = vtkRegressionTestImageThreshold(renderWindow, 15);
-        //if (retVal == vtkRegressionTester::DO_INTERACTOR)
-        {
-            iren->Start();
-        }
-        
         switch (char operation = getch()) {
         case 'w':
             cameraVerticalAngle += 5;
@@ -158,12 +126,8 @@ int vtkHandler(int argc, char* argv[])
         default:
             goto exit_loop;
         }
-        //renderWindow->ReleaseGraphicsResources(renderWindow);
-        //renderWindow->Finalize();
-        //renderWindow->Frame();
-        //renderer->ResetCamera();
     }
 exit_loop:
     printf("Job is done. \n");
-    return !retVal;
+    return 0;
 }
