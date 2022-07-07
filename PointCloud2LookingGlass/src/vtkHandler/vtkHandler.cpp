@@ -17,6 +17,8 @@
 #include "stdio.h"
 #include "conio.h"
 
+//#include "vld.h"
+
 // Keyboard value (US)
 #define arrowUp     38
 #define arrowDown   40
@@ -31,6 +33,7 @@ double cameraHorizontalAngle = 0.0, cameraVerticalAngle = 0.0, cameraScale = 1.0
 int vtkHandler(int argc, char* argv[])
 {
     vtkNew<vtkRenderer> renderer;
+    renderer->DebugOn();
     renderer->SetBackground(0.3, 0.4, 0.6);
     vtkNew<vtkRenderWindow> renderWindow;
     renderWindow->AddRenderer(renderer);
@@ -84,6 +87,7 @@ int vtkHandler(int argc, char* argv[])
         renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
         renderer->GetActiveCamera()->OrthogonalizeViewUp();
         renderer->GetActiveCamera()->Zoom(cameraScale);
+        //renderWindow->PrintSelf();
         renderWindow->Render();
 
         // Reset values after they are used
