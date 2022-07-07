@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     else {
         if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) usage();
         else if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--input") == 0) vtkHandler(argc, argv);
-        else    usage();
+        else    vtkHandler(argc, argv); //usage();
     }
     return 0;
 }

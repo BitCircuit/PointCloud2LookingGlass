@@ -11,6 +11,7 @@
 #include "vtkRenderStepsPass.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include <vtkInteractorStyleTrackballCamera.h>
 #include "vtkRenderer.h"
 #include "vtkTestUtilities.h"
 #include "vtkTextureObject.h"
@@ -19,24 +20,82 @@
 
 //#include "vld.h"
 
-// Keyboard value (US)
-#define arrowUp     38
-#define arrowDown   40
-#define arrowLeft   37
-#define arrowRight  39
-#define KEY_ESC     27
-
 // Some variables
 double cameraHorizontalAngle = 0.0, cameraVerticalAngle = 0.0, cameraScale = 1.0;
+vtkNew<vtkRenderer> renderer;
+vtkNew<vtkRenderWindow> renderWindow;
+
+namespace {
+
+    // Define interaction style
+    class KeyPressInteractorStyle : public vtkInteractorStyleTrackballCamera
+    {
+    public:
+        static KeyPressInteractorStyle* New();
+        vtkTypeMacro(KeyPressInteractorStyle, vtkInteractorStyleTrackballCamera);
+
+        virtual void OnKeyPress() override
+        {
+            // Get the keypress
+            vtkRenderWindowInteractor* rwi = this->Interactor;
+            std::string key = rwi->GetKeySym();
+
+            // Handle an arrow key
+            if (key == "Up") {
+                cameraVerticalAngle += 5;
+            }
+            if (key == "Down") {
+                cameraVerticalAngle -= 5;
+            }
+            if (key == "Left") {
+                cameraHorizontalAngle -= 5;
+            }
+            if (key == "Right") {
+                cameraHorizontalAngle += 5;
+            }
+
+            // Handle a "normal" key
+            if (key == "i") {
+                cameraScale += 0.5;
+            }
+            if (key == "o") {
+                cameraScale -= 0.5;
+            }
+            if (key == "r") {
+                renderer->ResetCamera();
+            }
+
+            renderer->GetActiveCamera()->Azimuth(cameraHorizontalAngle);
+            renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
+            renderer->GetActiveCamera()->OrthogonalizeViewUp();
+            renderer->GetActiveCamera()->Zoom(cameraScale);
+            renderWindow->Render();
+
+            cameraVerticalAngle = 0.0;
+            cameraHorizontalAngle = 0.0;
+            cameraScale = 1.0;
+
+            // Forward events
+            vtkInteractorStyleTrackballCamera::OnKeyPress();
+        }
+    };
+    vtkStandardNewMacro(KeyPressInteractorStyle);
+}
 
 //------------------------------------------------------------------------------
 int vtkHandler(int argc, char* argv[])
 {
-    vtkNew<vtkRenderer> renderer;
-    renderer->DebugOn();
+    
+    //renderer->DebugOn();
     renderer->SetBackground(0.3, 0.4, 0.6);
-    vtkNew<vtkRenderWindow> renderWindow;
+    
     renderWindow->AddRenderer(renderer);
+
+    vtkNew<vtkRenderWindowInteractor> iren;
+    iren->SetRenderWindow(renderWindow);
+    vtkNew<KeyPressInteractorStyle> style;
+    iren->SetInteractorStyle(style);
+    style->SetCurrentRenderer(renderer);
 
     char* fileName = argv[2];// vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/dragon.ply");
     vtkNew<vtkPLYReader> reader;
@@ -82,56 +141,12 @@ int vtkHandler(int argc, char* argv[])
     renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
     renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
     renderer->ResetCamera();
-    while (1) {
-        renderer->GetActiveCamera()->Azimuth(cameraHorizontalAngle);
-        renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
-        renderer->GetActiveCamera()->OrthogonalizeViewUp();
-        renderer->GetActiveCamera()->Zoom(cameraScale);
-        //renderWindow->PrintSelf();
-        renderWindow->Render();
+    renderer->GetActiveCamera()->Azimuth(cameraHorizontalAngle);
+    renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
+    renderer->GetActiveCamera()->Zoom(cameraScale);
 
-        // Reset values after they are used
-        cameraVerticalAngle = 0.0;
-        cameraHorizontalAngle = 0.0;
-        cameraScale = 1.0;
+    renderWindow->Render();
+    iren->Start();
 
-        switch (char operation = getch()) {
-        case 'w':
-            cameraVerticalAngle += 5;
-            printf("Turning up. %f\n", cameraVerticalAngle);
-            break;
-        case 's':
-            cameraVerticalAngle -= 5;
-            printf("Turning down. %f\n", cameraVerticalAngle);
-            break;
-        case 'a':
-            cameraHorizontalAngle -= 5;
-            printf("Turning left. %f\n", cameraHorizontalAngle);
-            break;
-        case 'd':
-            cameraHorizontalAngle += 5;
-            printf("Turning right. %f\n", cameraHorizontalAngle);
-            break;
-        case 'e':
-            cameraScale += 0.5;
-            printf("Zooming In. %f\n", cameraScale);
-            break;
-        case 'q':
-            cameraScale -= 0.5;
-            printf("Zooming Out. %f\n", cameraScale);
-            break;
-        case 'r':
-            cameraVerticalAngle = 0.0;
-            cameraHorizontalAngle = 0.0;
-            cameraScale = 1.0;
-            printf("Resetting Camera. \n");
-            renderer->ResetCamera();
-            break;
-        default:
-            goto exit_loop;
-        }
-    }
-exit_loop:
-    printf("Job is done. \n");
     return 0;
 }
