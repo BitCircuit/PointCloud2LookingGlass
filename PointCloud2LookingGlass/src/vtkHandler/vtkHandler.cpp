@@ -1,4 +1,5 @@
 #include "vtkActor.h"
+//#include "vtkActorCollection.h"
 #include "vtkCamera.h"
 #include "vtkLookingGlassInterface.h"
 #include "vtkLookingGlassPass.h"
@@ -11,16 +12,21 @@
 #include "vtkRenderStepsPass.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include <vtkInteractorStyleTrackballCamera.h>
+#include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkRenderer.h"
 #include "vtkTestUtilities.h"
 #include "vtkTextureObject.h"
+#include "vtkAnimationScene.h"
 #include "stdio.h"
 #include "conio.h"
+
+#include "filesystem"
 
 //#include "vld.h"
 
 // Some variables
+void singlePLYPlot(char*);
+void showVideo(char*);
 double cameraHorizontalAngle = 0.0, cameraVerticalAngle = 0.0, cameraScale = 1.0;
 vtkNew<vtkRenderer> renderer;
 vtkNew<vtkRenderWindow> renderWindow;
@@ -61,7 +67,13 @@ namespace {
             if (key == "o") {
                 cameraScale -= 0.5;
             }
+            if (key == "a") {
+                renderer->ResetCamera();
+            }
             if (key == "r") {
+                renderer->GetActiveCamera()->SetPosition(1, 0, 0);
+                renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
+                // TODO: Add zooming restore
                 renderer->ResetCamera();
             }
 
@@ -83,12 +95,21 @@ namespace {
 }
 
 //------------------------------------------------------------------------------
-int vtkHandler(int argc, char* argv[])
-{
-    
-    //renderer->DebugOn();
+void vtkHandler(char* argv[]) {
+    if (strcmp(argv[2], "-p") == 0) {
+        singlePLYPlot(argv[3]);
+    }
+    else if (strcmp(argv[2], "-m") == 0) {
+        showVideo(argv[3]);
+    }
+    else {
+        printf("Unrecognized Commend. \n");
+    }
+}
+
+
+void singlePLYPlot(char* path) {
     renderer->SetBackground(0.3, 0.4, 0.6);
-    
     renderWindow->AddRenderer(renderer);
 
     vtkNew<vtkRenderWindowInteractor> iren;
@@ -97,12 +118,10 @@ int vtkHandler(int argc, char* argv[])
     iren->SetInteractorStyle(style);
     style->SetCurrentRenderer(renderer);
 
-    char* fileName = argv[2];// vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/dragon.ply");
+    char* fileName = path;
     vtkNew<vtkPLYReader> reader;
     reader->SetFileName(fileName);
     reader->Update();
-
-    //delete[] fileName;
 
     vtkNew<vtkPolyDataMapper> mapper;
     mapper->SetInputConnection(reader->GetOutputPort());
@@ -147,6 +166,12 @@ int vtkHandler(int argc, char* argv[])
 
     renderWindow->Render();
     iren->Start();
+}
 
-    return 0;
+void showVideo(char* path) {
+    
+    
+    
+    renderWindow->AddRenderer(renderer);
+
 }

@@ -1,1 +1,1 @@
-int vtkHandler(int, char*[]);
+void vtkHandler(char* []);
