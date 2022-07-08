@@ -1,5 +1,5 @@
 #include "vtkActor.h"
-//#include "vtkActorCollection.h"
+#include "vtkActorCollection.h"
 #include "vtkCamera.h"
 #include "vtkLookingGlassInterface.h"
 #include "vtkLookingGlassPass.h"
