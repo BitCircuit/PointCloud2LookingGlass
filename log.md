@@ -144,12 +144,30 @@ Found out when program reads `0x1A` (same as ctrl+z in ASCII) would trigger EOF 
 - Study Microsoft Azure Kinect Sensor SDK. URL: https://microsoft.github.io/Azure-Kinect-Sensor-SDK/master/index.html
 - This SDK is only supported on Windows and Ubuntu. 
 - Before proceeding to study example codes, here are some thoughts:
-- - Use `k4a_device_open` to create a `device_handle` instance. (i.e. `cam`)
-- - Use `k4a_device_start_cameras` with some config file to start camera. 
-- - Use `k4a_device_get_capture` with `cam` to create a `capture_handle` instance. (i.e. `cap`)
-- - Use `k4a_capture_get_color_image` with `cap` to get `colorImg`. 
-- - Use `k4a_capture_get_depth_image` with `cap` to get `depthImg`
+>Use `k4a_device_open` to create a `device_handle` instance. (i.e. `cam`)  
+>Use `k4a_device_start_cameras` with some config file to start camera.  
+>Use `k4a_device_get_capture` with `cam` to create a `capture_handle` instance. (i.e. `cap`)  
+>Use `k4a_capture_get_color_image` with `cap` to get `colorImg`.  
+>Use `k4a_capture_get_depth_image` with `cap` to get `depthImg`
 
-- - Guess: `k4a_transformation_depth_image_to_point_cloud` 
+- Guess: `k4a_transformation_depth_image_to_point_cloud` 
 could only generate point cloud without color information?
 
+## Jul. 12, 2022
+- Studied Azure SDK is an open source project. However, this SDK invokes code from `Depth Engine` which contains proprietary code and is a closed source. Since `Depth Engine` is supported on Windows and Ubuntu 18.04, this project is limited to such two platforms. 
+- Installed `MeshLab` and constructed surface for `amphi_vertices.ply` by using provided `Ball Pivoting Algorithm`. 
+- After meshing, the `amphi_vertices.ply` file can be shown in `VTK`. 
+- Tested with other PLY files (i.e. `voxel factory.bake.ply`). Confirmed that `VTK` can show color if the color information for each vertex is packed in the PLY files. (However, `3D Viewer` cannot. There is just a gray object. )
+- While waiting for Azure 3D camera being delivered, `Record3D` can be used to learn and test how to make `VTK` taking live signal and render frames.
+> Both Azure and Record3D separate RGB and Depth frames.  
+> TODO: Figure out how `VTK` combine two frames. And since RGB frame has higher resolution than Depth frame, I need to match RGB pixel with Depth pixel.  
+- Decided to deal with pre-recorded data first (The time-varying data). As `Record3D` could export recording video to a sequence of PLY files, TODO: make a function that can scan PLY files in a directory. 
+- Tried an example code provided by VTK. While compiling, Linker error: cannot find external symbols. Example code has included many new libraries. In Windows 11, navigated to VTK install directory, find lib folder, selected all .lib files, right-click and choose `copy as path`. In `NotePad`, paste, use `find and replace` to remove all quotation marks. Back to Visual Studio 2022, paste into external dependencies. 
+- Copied code from https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c and modify it to be able to filter the list by file type (by comparing last 4 chars). 
+- Changed solution proprity -> C/C++ -> language -> change language standard to `C++20`, as `filesystem` library requires `C++17` or later. 
+- `Path` data conversion: path -`u8string()`-> string -`c_str()`-> char pointer. With `C++20`, u8string() cannot convert to string. The language standard is changed to `C++17`.
+- `printf` cannot print vector element. Just use `std::cout`
+- With function `c_str()` transferring string element in vector to char array, `printf` can print it. 
+
+## Jul. 13, 2022
+- There are not many resources or example codes available regarding to time-varying data. After reading some and trying to follow, there are still some gaps. Feels like it may be a wrong approach to play video. Switch to animation approach. 
