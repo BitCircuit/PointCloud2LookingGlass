@@ -154,20 +154,60 @@ Found out when program reads `0x1A` (same as ctrl+z in ASCII) would trigger EOF 
 could only generate point cloud without color information?
 
 ## Jul. 12, 2022
+### Azure
 - Studied Azure SDK is an open source project. However, this SDK invokes code from `Depth Engine` which contains proprietary code and is a closed source. Since `Depth Engine` is supported on Windows and Ubuntu 18.04, this project is limited to such two platforms. 
+### Mesh PLY (constructing faces)
 - Installed `MeshLab` and constructed surface for `amphi_vertices.ply` by using provided `Ball Pivoting Algorithm`. 
 - After meshing, the `amphi_vertices.ply` file can be shown in `VTK`. 
 - Tested with other PLY files (i.e. `voxel factory.bake.ply`). Confirmed that `VTK` can show color if the color information for each vertex is packed in the PLY files. (However, `3D Viewer` cannot. There is just a gray object. )
+### Video frames
 - While waiting for Azure 3D camera being delivered, `Record3D` can be used to learn and test how to make `VTK` taking live signal and render frames.
 > Both Azure and Record3D separate RGB and Depth frames.  
 > TODO: Figure out how `VTK` combine two frames. And since RGB frame has higher resolution than Depth frame, I need to match RGB pixel with Depth pixel.  
 - Decided to deal with pre-recorded data first (The time-varying data). As `Record3D` could export recording video to a sequence of PLY files, TODO: make a function that can scan PLY files in a directory. 
 - Tried an example code provided by VTK. While compiling, Linker error: cannot find external symbols. Example code has included many new libraries. In Windows 11, navigated to VTK install directory, find lib folder, selected all .lib files, right-click and choose `copy as path`. In `NotePad`, paste, use `find and replace` to remove all quotation marks. Back to Visual Studio 2022, paste into external dependencies. 
-- Copied code from https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c and modify it to be able to filter the list by file type (by comparing last 4 chars). 
+### Write File Scanning function
+- Copied code from https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c It is a for loop to invoke `filesystem` library. 
+- Used `std::vector<std::String>` in C++ for dynamic array.
 - Changed solution proprity -> C/C++ -> language -> change language standard to `C++20`, as `filesystem` library requires `C++17` or later. 
 - `Path` data conversion: path -`u8string()`-> string -`c_str()`-> char pointer. With `C++20`, u8string() cannot convert to string. The language standard is changed to `C++17`.
+- Used `strcmp` to compare last four chars to filter file type. 
+- Used `.push_back()` to add item in vector. 
 - `printf` cannot print vector element. Just use `std::cout`
 - With function `c_str()` transferring string element in vector to char array, `printf` can print it. 
 
 ## Jul. 13, 2022
-- There are not many resources or example codes available regarding to time-varying data. After reading some and trying to follow, there are still some gaps. Feels like it may be a wrong approach to play video. Switch to animation approach. 
+- There are not many resources or example codes available regarding to time-varying data.
+- Tried test case `TestTemporalFractal` provided by VTK. It seems like the data itself has temporal data. Not applicable to this project as the temporal vector needs to be created manually. 
+- After reading some and trying to follow, there are still some gaps. Feels like it may be a wrong approach to play video. Switch to animation approach. 
+
+## Jul. 14, 2022
+- Learnt namespace and class. Change global varibles `renderer` and `renderWindow` back to local varibles. Guess it could take advantages of automatic mechanism to clean their memory after program is executed. 
+- Made namespace (which has interactive keyboard callback class) separate (declare at top and define at bottom)
+
+## Jul. 15, 2022
+- Successfully play animation in VTK. Used for loop to add all frames as cues in animation scene. 
+- While creating pipeline, the reader must have an input file. Initialized with the first element in the file list. 
+- When adding cue: set file path for reader -> update reader -> render window (rewriting `TickInternal` API)
+- setting for animation scene:
+> start time: 0  
+> end time: numFileScanned / FPS  
+> frame rate: FPS  
+> sequence mode  
+- setting for each animation cue:
+> time mode normalized  
+> start time: frameIndex / numFileScanned  
+> end time: (frameIndex + 1) / numFileScanned  
+- Found problems:
+> 1. It is only depth information, there is no colour yet. I can see frames are changing, but cannot recognize the picture. 
+> 2. The depth information contains distance to the background wall and ceiling, makes the main actor (me) too small to see in the plot (this happens in Matlab as well). Again, this makes hard to recognize the video content. Needs to filter out some information. 
+> 3. The perspective of 3D model is weird. Interactor module cannot be applied in animation (so far). Considering adding a calibration procedure for each camera model (assume the video format produced by same camera would be same). 
+- For problem 3 calibration procedure:
+> 1. Show the first frame from the video directory. Use interactive mode to adjust camera position. Save it as a camera profile in the program path. 
+> 2. Everytime loading a video. Scan for config file in video directory, if there isn't one. Ask user to choose one camera profile, then save the choice into the video directory. 
+> 3. If there is a config file in video path, then load it. Apply the camera position. Play animation as normal. 
+> 4. If the perspective is still weird, config file is able to overwrite the camera position which was defined in camera profile. 
+> 5. Use similar method for max depth as well. To solve problem 2. 
+- More problems: 
+> 1. Since the animation requires rendering in a loop. The window becomes unresponsive if another window is active (i.e. the terminal window which launched it)
+> 2. To see if the memory leak problem happens again, run the code with debugger. The amount of ply files is 276, divided by 30 FPS, should be 9 seconds length. But the debugger counts the program run for 30 seconds. Need to dig for reason. 
