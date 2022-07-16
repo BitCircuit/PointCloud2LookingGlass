@@ -21,23 +21,35 @@
 #include "filesystem"
 #include "vector"
 
-using namespace std;
+#include "rapidjson/document.h"
 
-// File types for scanFileByType function
-#define plyFile     ".ply"
-#define jpgFile     ".jpg"
-#define pngFile     ".png"
+using namespace std;
+using namespace rapidjson;
+
+// Some enum
+enum cameraClippingPlaneSelection { none, near, far };
+//enum fileScanTypes { config, profile, depth, colorJPG };
+enum singlePLYOperationModes {normal, calibration};
 
 // Some functions
 void singlePLYPlot(char*);
 void showVideo(char*, int);
-void scanFileByType(char*, const char*);
+void scanFile(char*);
 //int TestTemporalFractal();
 
 // Some variables
 double cameraHorizontalAngle = 0.0, cameraVerticalAngle = 0.0, cameraScale = 1.0;
-int numFileScanned = 0;
-vector<string> fileList;
+double cameraClippingRangeNear = 0.0, cameraClippingRangeFar = 0.0;
+cameraClippingPlaneSelection camClipSel = none;
+singlePLYOperationModes singlePLYOperationMode = normal;
+
+vector<string> videoDepthFileList;
+vector<string> videoColorFileList;
+vector<string> configFilePath;
+vector<string> cameraProfilePath;
+int numDepthFileScanned = 0, numColorFileScanned = 0;
+bool isDepthFileFound = false, isColorFileFound = false, isConfigFileFound = false, isCameraProfileFound = false;
+
 
 namespace something{
     // Define interaction style
@@ -78,7 +90,7 @@ void vtkHandler(char* argv[]) {
         //TestTemporalFractal();
     }
     else if (strcmp(argv[2], "-s") == 0) {
-        scanFileByType(argv[3], plyFile);
+        scanFile(argv[3]);
     }
     else {
         printf("Unrecognized Commend. \n");
@@ -86,6 +98,8 @@ void vtkHandler(char* argv[]) {
 }
 
 void singlePLYPlot(char* path) {
+    singlePLYOperationMode = normal;
+    
     vtkNew<vtkRenderer> renderer;
     vtkNew<vtkRenderWindow> renderWindow;
     vtkNew<vtkRenderWindowInteractor> iren;
@@ -96,6 +110,7 @@ void singlePLYPlot(char* path) {
 
     style->renderer = renderer;
     style->renderWindow = renderWindow;
+    style->videoMode = false;
 
     renderer->SetBackground(0.3, 0.4, 0.6);
     renderWindow->AddRenderer(renderer);
@@ -144,16 +159,19 @@ void singlePLYPlot(char* path) {
     renderer->GetActiveCamera()->Azimuth(cameraHorizontalAngle);
     renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
     renderer->GetActiveCamera()->Zoom(cameraScale);
+    renderer->GetActiveCamera()->GetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
 
     renderWindow->Render();
     iren->Start();
 }
 
 void showVideo(char* path, int FPS) {
-    scanFileByType(path, plyFile);
-    //for (auto i = fileList.begin(); i != fileList.end(); i++)   std::cout << *i << std::endl;
-    //printf("%s\n",fileList[0].c_str());
-    //printf("File Scan Done.\n");
+    scanFile(path);
+
+    if (!isConfigFileFound) {
+        singlePLYOperationMode = calibration;
+    }
+
     vtkNew<vtkRenderer> renderer;
     vtkNew<vtkRenderWindow> renderWindow;
     vtkNew<vtkRenderWindowInteractor> iren;
@@ -165,6 +183,8 @@ void showVideo(char* path, int FPS) {
     // Create an Animation Scene
     vtkAnimationScene* scene = vtkAnimationScene::New();
 
+    style->renderer = renderer;
+    style->renderWindow = renderWindow;
     style->videoMode = true;
     style->scene = scene;
 
@@ -173,7 +193,7 @@ void showVideo(char* path, int FPS) {
     iren->SetInteractorStyle(style);
     style->SetCurrentRenderer(renderer);
 
-    reader->SetFileName(fileList[0].c_str());
+    reader->SetFileName(videoDepthFileList[0].c_str());
     reader->Update();
 
     mapper->SetInputConnection(reader->GetOutputPort());
@@ -240,7 +260,7 @@ void showVideo(char* path, int FPS) {
 }
 
 // Reference: https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
-void scanFileByType(char* path, const char* fileType) {
+void scanFile(char* path) {
     for (const auto& entry : filesystem::directory_iterator(path)) {
         filesystem::path temp0 = entry.path();
         std::string temp{temp0.u8string()};
@@ -248,12 +268,33 @@ void scanFileByType(char* path, const char* fileType) {
         int len = strlen(filePath);
         // Reference: https://stackoverflow.com/questions/5297248/how-to-compare-last-n-characters-of-a-string-to-another-string-in-c
         const char* lastFourChar = &filePath[len - 4];
-        if (strcmp(lastFourChar, fileType) == 0) {
-            numFileScanned++;
-            fileList.push_back(filePath);
+
+        if (strcmp(lastFourChar, ".ply") == 0) {
+            isDepthFileFound = true;
+            numDepthFileScanned++;
+            videoDepthFileList.push_back(filePath);
+        }
+        if (strcmp(lastFourChar, ".jpg") == 0) {
+            isColorFileFound = true;
+            numColorFileScanned++;
+            videoColorFileList.push_back(filePath);
+        }
+        if (strcmp(lastFourChar, "json") == 0) {
+            const char* jsonFileName = &filePath[len - 16];
+            if (strcmp(jsonFileName, "cameraModel.json") == 0) {
+                isCameraProfileFound = true;
+                cameraProfilePath.push_back(filePath);
+            }
+            if (strcmp(jsonFileName, "videoConfig.json") == 0) {
+                isConfigFileFound = true;
+                configFilePath.push_back(filePath);
+            }
         }
     }
-    fileList.shrink_to_fit();
+    videoDepthFileList.shrink_to_fit();
+    videoColorFileList.shrink_to_fit();
+    cameraProfilePath.shrink_to_fit();
+    configFilePath.shrink_to_fit();
 }
 
 void something::KeyPressInteractorStyle::OnKeyPress() {
@@ -291,6 +332,35 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
         // TODO: Add zooming restore
         renderer->ResetCamera();
     }
+    if (key == "l") {
+        if (camClipSel == none)     printf("No plane selected. \n");
+        else if (camClipSel == near)    cameraClippingRangeNear -= 1.0;
+        else if (camClipSel == far)     cameraClippingRangeFar -= 1.0;
+    }
+    if (key == "p") {
+        if (camClipSel == none)     printf("No plane selected. \n");
+        else if (camClipSel == near)    cameraClippingRangeNear += 1.0;
+        else if (camClipSel == far)     cameraClippingRangeFar += 1.0;
+    }
+    if (key == "c") {
+        switch (camClipSel) {
+        case none:
+            camClipSel = near;
+            printf("Camera Clipping Plane Near seleted.");
+            break;
+        case near:
+            camClipSel = far;
+            printf("Camera Clipping Plane Far seleted.");
+            break;
+        case far:
+            camClipSel = none;
+            printf("Camera Clipping Plane Unseleted.");
+            break;
+        default:
+            camClipSel = none;
+            printf("Camera Clipping Plane Unseleted.");
+        }
+    }
     if (key == " ") {
         isVideoPlaying = !isVideoPlaying;
     }
@@ -299,14 +369,17 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
     renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
     renderer->GetActiveCamera()->OrthogonalizeViewUp();
     renderer->GetActiveCamera()->Zoom(cameraScale);
+    renderer->GetActiveCamera()->SetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
     renderWindow->Render();
 
     cameraVerticalAngle = 0.0;
     cameraHorizontalAngle = 0.0;
     cameraScale = 1.0;
 
-    if (isVideoPlaying)  scene->Play();
-    else  scene->Stop();
+    if (videoMode) {
+        if (isVideoPlaying)  scene->Play();
+        else  scene->Stop();
+    }
 
     // Forward events
     vtkInteractorStyleTrackballCamera::OnKeyPress();
