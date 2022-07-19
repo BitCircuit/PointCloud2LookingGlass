@@ -211,3 +211,41 @@ could only generate point cloud without color information?
 - More problems: 
 > 1. Since the animation requires rendering in a loop. The window becomes unresponsive if another window is active (i.e. the terminal window which launched it)
 > 2. To see if the memory leak problem happens again, run the code with debugger. The amount of ply files is 276, divided by 30 FPS, should be 9 seconds length. But the debugger counts the program run for 30 seconds. Need to dig for reason. 
+
+## Jul. 17, 2022
+- While searching for methods to combine color and depth frames (it is hard because of resolution difference and coordinate alignment), found that `Point Cloud Library` may be capable doing it. 
+- For camera:
+> 1. `PCL` has a class `OpenNI` wrapper. OpenNI is another library which can connect to any OpenNI-compatiable devices. Luckly, Kinect Azure is OpenNI compatiable. Since OpenNI supports Mac OS X (although just for Intel processor), the Kinect Azure could be used in Mac as well.  
+> 2. Based on OpenNI's APIs, if Kinect Azure supports hardware sync of color and depth stream, `PCL` should be able to get point cloud with XYZ, RGB, Normal, etc. in one dataset.  
+> 3. Since `PCL` works with `VTK`, it has an API called convert to VTK. It takes meshed point cloud dataset and convert to `vtkPolyData`. So, it should be able to connect directly to the pipeline in VTK.  
+> 4. In `VTK`, probably need to render the window as same speed as `FPS` which can get from `OpenNI`.  
+- For prerecorded video (a sequence of PLY and JPG files):
+> Still searching...
+
+## Jul. 18, 2022
+- Let program check whether PLY files have face element and color information. If not, direct to output a message (0 face or 0 color) and direct to mesh algorithm (0 face). 
+- Modifying `plyReader.c` I wrote at the beginning of this project. (I don't want it abondent).
+> 1. Change it from language C to C++
+> 2. Make it recognizing color element (already exists) and face element > 0. 
+> 3. Make `colorRGBEnable` and `faceElementEnable` a public variable. 
+- Gethered 3D model from another iOS app `Heges`. By using `HxD`, I found out that their exported PLY file has some special format (Right before the number of vertex and face. Instead of one space, there are 5 `0x20`). Looking for APIs in both `VTK` and `PCL`. Their code is more advanced (may cover more unseen sepcial formats).
+> 1. Loading ply file to `reader`
+> 2. `reader->GetOutput()` gives `vtkPolyData` type
+> 3. `reader->GetOutput()->GetNumberOfPolys()` returns number of face elements. If it equals to 0, the PLY file(s) will be direct to meshing algo. 
+> 4. `reader->GetOutput()->GetNumberOfElements(0)` returns number of vertex elements. 
+> 5. Have not found any API under reader could return color information. 
+> 6. Tried to connect reader with poly data mapper. The color map returns 0. 
+
+## Jul. 19, 2022
+- For combining a static PLY and a static JPG: 
+> 1. Tried to follow sample code related to vtkFilters. 
+>> a. `ImageToPolyDataFilter`: The code could not be compiled because of data type is not matched (`i2pd->SetLookupTable(quant->GetLookupTable())`).  
+>> b. `CombinePolyData` seems like just adding another object to the window. 
+>> c. `AlignTwoPolyDatas` seems like capable of solving alignment problem. But It needs point a. Convert image to poly data first. 
+>
+> 2. Searching for APIs I may use from `Point Cloud Library`. 
+>> a. It doesn't have jpeg reader function. 
+>
+> 3. Seems like it is a mission impossible if there is no camera's parameters such as calibration data.  
+> 
+> Temporary conclusion: pre-recorded PLY files has to have color information in vertex or face, or only depth information can be plotted. 
