@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\readPointCloudFile\plyReader.c" />
+    <ClCompile Include="src\readPointCloudFile\plyReader.cpp" />
     <ClCompile Include="src\vtkHandler\vtkHandler.cpp" />
   </ItemGroup>
   <ItemGroup>

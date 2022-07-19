@@ -5,6 +5,7 @@
 #include "vtkNew.h"
 #include "vtkOpenGLRenderer.h"
 #include "vtkPLYReader.h"
+#include "vtkJPEGReader.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 #include "vtkRenderStepsPass.h"
@@ -16,15 +17,20 @@
 #include "vtkAnimationScene.h"
 #include "vtkSmartPointer.h"
 
+#include "vtkImageQuantizeRGBToIndex.h"
+#include "vtkImageToPolyDataFilter.h"
+#include "vtkTriangleFilter.h"
+#include "vtkAppendPolyData.h"
+
 #include "stdio.h"
 
 #include "filesystem"
 #include "vector"
 
-#include "rapidjson/document.h"
+//#include "rapidjson/document.h"
 
 using namespace std;
-using namespace rapidjson;
+//using namespace rapidjson;
 
 // Some enum
 enum cameraClippingPlaneSelection { none, near, far };
@@ -33,6 +39,7 @@ enum singlePLYOperationModes {normal, calibration};
 
 // Some functions
 void singlePLYPlot(char*);
+void dummyExperiment(char*);
 void showVideo(char*, int);
 void scanFile(char*);
 //int TestTemporalFractal();
@@ -91,6 +98,9 @@ void vtkHandler(char* argv[]) {
     }
     else if (strcmp(argv[2], "-s") == 0) {
         scanFile(argv[3]);
+    }
+    else if (strcmp(argv[2], "-d") == 0) {
+        dummyExperiment(argv[3]);
     }
     else {
         printf("Unrecognized Commend. \n");
@@ -240,16 +250,16 @@ void showVideo(char* path, int FPS) {
     scene->SetModeToSequence();
     scene->SetFrameRate(FPS);
     scene->SetStartTime(0);
-    scene->SetEndTime(numFileScanned / FPS);
+    scene->SetEndTime(numDepthFileScanned / FPS);
 
-    for (int frameIndex = 0; frameIndex < numFileScanned; frameIndex++) {
+    for (int frameIndex = 0; frameIndex < numDepthFileScanned; frameIndex++) {
         vtkNew<something::videoFrames> frame;
-        frame->filePath = fileList[frameIndex];
+        frame->filePath = videoDepthFileList[frameIndex];
         frame->reader = reader;
         frame->renderWindow = renderWindow;
         frame->SetTimeModeToNormalized();
-        frame->SetStartTime((double)(frameIndex / numFileScanned));
-        frame->SetEndTime((double)((frameIndex + 1) / numFileScanned));
+        frame->SetStartTime((double)(frameIndex / numDepthFileScanned));
+        frame->SetEndTime((double)((frameIndex + 1) / numDepthFileScanned));
         scene->AddCue(frame);
         //printf("Adding frame %d from %s\n", frameIndex+1, frame->filePath.c_str());
     }
@@ -389,4 +399,8 @@ void something::videoFrames::TickInternal(double currenttime, double deltatime, 
     reader->SetFileName(this->filePath.c_str());
     reader->Update();
     renderWindow->Render();
+}
+
+void dummyExperiment(char* plyPath) {
+
 }
