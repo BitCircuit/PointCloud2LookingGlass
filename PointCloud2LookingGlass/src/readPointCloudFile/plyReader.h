@@ -46,6 +46,8 @@ typedef union {
 
 struct Vertex {
     int totalAmount;
+    int vertexAmount;
+    int faceAmount;
 
     int formatMode;
 
@@ -78,10 +80,12 @@ struct Vertex {
     bool colorAlphaEnable;
     int colorAlphaReadLength;
     uint8_t* colorAlphaUnsignedInt8;
+
+    bool faceElementEnable;
 };
 struct Vertex vertex1;
 
 void readPLY(char**);
 float bin2Flo(int, unsigned char*);
 uint8_t bin2UChar(unsigned char*);
-unsigned int convertToInt(int*, int, int);
+unsigned int convertToInt(unsigned int*, int, int);

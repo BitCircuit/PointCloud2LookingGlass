@@ -19,7 +19,7 @@ void init() {
 
 void readPLY(char* path[]) {
     init();
-    unsigned char* info;
+    char* info;
     info = (char*)malloc(100 * sizeof(char));
 
     //printf("path is %s\n", path[2]);
@@ -154,26 +154,26 @@ void readPLY(char* path[]) {
     for (int i = 0; i < vertex1.totalAmount; i++) {
         for (int j = 0; j < 3; j++) {
             fread(info, 1, vertex1.coordinateReadLength, src);
-            vertex1.coordinateFloat[j][i] = bin2Flo(vertex1.formatMode, info);
+            vertex1.coordinateFloat[j][i] = bin2Flo(vertex1.formatMode, (unsigned char*)info);
             memset(info, 0, 100 * sizeof(char));
         }
         if (vertex1.normalEnable) {
             for (int j = 0; j < 3; j++) {
                 fread(info, 1, vertex1.normalReadLength, src);
-                vertex1.normalFloat[j][i] = bin2Flo(vertex1.formatMode, info);
+                vertex1.normalFloat[j][i] = bin2Flo(vertex1.formatMode, (unsigned char*)info);
                 memset(info, 0, 100 * sizeof(char));
             }
         }
         if (vertex1.colorRGBEnable) {
             for (int j = 0; j < 3; j++) {
                 fread(info, 1, vertex1.colorRGBReadLength, src);
-                vertex1.colorRGBUnsignedInt8[j][i] = bin2UChar(info);
+                vertex1.colorRGBUnsignedInt8[j][i] = bin2UChar((unsigned char*)info);
                 memset(info, 0, 100 * sizeof(char));
             }
         }
         if (vertex1.colorAlphaEnable) {
             fread(info, 1, vertex1.colorAlphaReadLength, src);
-            vertex1.colorAlphaUnsignedInt8[i] = bin2UChar(info);
+            vertex1.colorAlphaUnsignedInt8[i] = bin2UChar((unsigned char*)info);
             memset(info, 0, 100 * sizeof(char));
         }
     }
@@ -233,7 +233,7 @@ uint8_t bin2UChar(unsigned char* bin) {
 
 // Function to convert a binary array to the corresponding integer
 // Reference: https://www.geeksforgeeks.org/program-for-conversion-of-32-bits-single-precision-ieee-754-floating-point-representation/
-unsigned int convertToInt(int* arr, int low, int high) {
+unsigned int convertToInt(unsigned int* arr, int low, int high) {
     unsigned f = 0, i;
     for (i = high; i >= low; i--) {
         f = f + arr[i] * pow(2, high - i);
