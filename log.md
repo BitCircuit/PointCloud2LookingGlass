@@ -249,3 +249,17 @@ could only generate point cloud without color information?
 > 3. Seems like it is a mission impossible if there is no camera's parameters such as calibration data.  
 > 
 > Temporary conclusion: pre-recorded PLY files has to have color information in vertex or face, or only depth information can be plotted. 
+
+- Constructe face if there is no face element present in PLY file (since point cloud generally means the points represents X, Y, and Z, does not necessary contain face element):
+> Reference: `Realistic 3D Face Reconstruction Based on VTK and MFC` doi: 10.1109/ICOIP.2010.271  
+> 1. Modify and integrate sample code `Delaunay2D`. The face is generated and the 3D model is plotted on the window. Problem: If there are multiple objects in the file, and their depth information have significant difference, this algorithm still connects them together. 
+> 2. Based on API of `vtkDelaunay2D`. Setting Alpha (max distance) should solve the problem from point 1. 
+>> a. After testing, setting Alpha to 0.075 has a good result to the sample I tested. And assume it would be a general result for all. Smaller number may result in discrete points near object's edge. Larger number may result in everything connects together. 
+>> b. Found another API which sets tolerance. After testing, it would affect the surface smooth. If the tolerance too large, the object has low details (i.e. facial features may not be recognized). If the tolerance too small, the object surface may become uneven. I believe that recognizing facial features has higher priority on this matter. Best result is to comment out the command and leave it as default. :joy:  
+>
+> 3. Make it as a seperate method, which can be called from the beginning of other methods. Note: the face construction takes long time to compute. Save the meshed file(s), set a flag in JSON, and load meshed result next time directly. 
+> 4. After testing, `vtkPLYWriter` does not write color information by default. Need to dig into reader or mapper to get color map. 
+>> Solution: adding `writer->SetArrayName("RGB");` to writer.  
+>> Worry about what if the original file has alpha data (transparent). That would need to be `"RGBA"` (guess from `vtkPLYReader` source code). Need a method to read if there is alpha value. Write a simplified version of `plyReader` just to determine if there is color and alpha value. 
+
+- In `Realistic 3D Face Reconstruction Based on VTK and MFC`, `vtkTexture` is mentioned, which may map color on polydata. After running the example code `ProjectedTexture`, points are painted with color, but they are mismatched. Guess this is where the camera's parameter data is used.  

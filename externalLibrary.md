@@ -16,11 +16,6 @@
 - Version: 0.2.0
 - Closed Source License: Looking Glass Factory Inc. 
 
-## Rapid JSON
-- URL: http://rapidjson.org/
-- MIT License
-- Version: 1.1.0
-- Mandatory Dependencies: CMake
 
 ## Microsoft Azure Kinect SDK
 - URL: https://docs.microsoft.com/en-us/azure/kinect-dk/
@@ -33,6 +28,17 @@
 ## Point Cloud Library
 
 ## OpenNI
+
+## Rapid JSON
+- URL: http://rapidjson.org/
+- MIT License
+- Version: 1.1.0
+- Mandatory Dependencies: CMake
+
+## Progress Bar
+- URL: https://github.com/gipert/progressbar
+- MIT License
+- Version: 2.1
 
 # Extra tool while creating this project
 ## CMake
