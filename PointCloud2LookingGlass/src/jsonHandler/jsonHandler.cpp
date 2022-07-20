@@ -4,11 +4,8 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/reader.h"
-#include <rapidjson/ostreamwrapper.h>
-#include <rapidjson/istreamwrapper.h>
-#include "fstream"
-
-#include "iostream"
+#include "rapidjson/ostreamwrapper.h"
+#include "rapidjson/istreamwrapper.h"
 
 using namespace rapidjson;
 using namespace std;

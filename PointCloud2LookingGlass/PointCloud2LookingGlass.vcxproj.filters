@@ -27,6 +27,9 @@
     <ClCompile Include="src\jsonHandler\jsonHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Util\Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\readPointCloudFile\plyReader.h">
@@ -35,10 +38,13 @@
     <ClInclude Include="src\vtkHandler\vtkHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\progressbar.hpp">
+    <ClInclude Include="src\jsonHandler\jsonHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\jsonHandler\jsonHandler.h">
+    <ClInclude Include="src\Util\Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\progressbar.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

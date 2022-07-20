@@ -1,3 +1,5 @@
+#include "vtkHandler.h"
+
 #include "vtkActor.h"
 #include "vtkCamera.h"
 #include "vtkLookingGlassInterface.h"
@@ -17,48 +19,25 @@
 #include "vtkTextureObject.h"
 #include "vtkAnimationScene.h"
 #include "vtkSmartPointer.h"
-
 #include "vtkDelaunay2D.h"
-
-#include "stdio.h"
-
-#include "filesystem"
-#include "vector"
-
-#include "../progressbar.hpp"
 
 using namespace std;
 
 // Some enum
 enum cameraClippingPlaneSelection { none, near, far };
-//enum fileScanTypes { config, profile, depth, colorJPG };
 enum singlePLYOperationModes {normal, calibration};
-enum findMode {alpha, color};
 
 // Some functions
 void singlePLYPlot(char*);
 void dummyExperiment(char*);
 void showVideo(char*, int);
-void scanFile(char*);
 void plyMesh(char*, char*);
-bool findInPLY(char*, findMode);
-//int TestTemporalFractal();
 
 // Some variables
-double cameraHorizontalAngle = 0.0, cameraVerticalAngle = 0.0, cameraScale = 1.0;
 double cameraClippingRangeNear = 0.0, cameraClippingRangeFar = 0.0;
-cameraClippingPlaneSelection camClipSel = none;
 singlePLYOperationModes singlePLYOperationMode = normal;
 
-vector<string> videoDepthFileList;
-vector<string> videoColorFileList;
-vector<string> configFilePath;
-vector<string> cameraProfilePath;
-int numDepthFileScanned = 0, numColorFileScanned = 0;
-bool isDepthFileFound = false, isColorFileFound = false, isConfigFileFound = false, isCameraProfileFound = false;
-
-progressbar bar(100);
-
+vector<string> fileList;
 
 namespace something{
     // Define interaction style
@@ -70,6 +49,7 @@ namespace something{
         vtkRenderWindow* renderWindow;
         bool videoMode = false;
         bool isVideoPlaying = false;
+        cameraClippingPlaneSelection camClipSel = none;
         vtkAnimationScene* scene;
         virtual void OnKeyPress() override;
     };
@@ -88,25 +68,11 @@ namespace something{
     vtkStandardNewMacro(videoFrames);
 }
 
-void vtkHandler(char* argv[]) {
-    if (strcmp(argv[2], "-p") == 0) {
-        singlePLYPlot(argv[3]);
-    }
-    else if (strcmp(argv[2], "-m") == 0) {
-        showVideo(argv[3], 30);
-    }
-    else if (strcmp(argv[2], "-t") == 0) {
-        //TestTemporalFractal();
-    }
-    else if (strcmp(argv[2], "-s") == 0) {
-        scanFile(argv[3]);
-    }
-    else if (strcmp(argv[2], "-d") == 0) {
-        dummyExperiment(argv[3]);
-    }
-    else {
-        printf("Unrecognized Commend. \n");
-    }
+void vtkHandler(char* path) {
+    int len = strlen(path);
+    const char* lastFourChar = &path[len - 4];
+    if (strncmp(lastFourChar, ".ply", 4) == 0)  singlePLYPlot(path);    // if path ends with .ply
+    else showVideo(path, 30);       // if path ends without .ply -> directory
 }
 
 void singlePLYPlot(char* path) {
@@ -198,9 +164,6 @@ void singlePLYPlot(char* path) {
     renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
     renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
     renderer->ResetCamera();
-    renderer->GetActiveCamera()->Azimuth(cameraHorizontalAngle);
-    renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
-    renderer->GetActiveCamera()->Zoom(cameraScale);
     renderer->GetActiveCamera()->GetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
 
     renderWindow->Render();
@@ -208,11 +171,6 @@ void singlePLYPlot(char* path) {
 }
 
 void showVideo(char* path, int FPS) {
-    scanFile(path);
-
-    if (!isConfigFileFound) {
-        singlePLYOperationMode = calibration;
-    }
 
     vtkNew<vtkRenderer> renderer;
     vtkNew<vtkRenderWindow> renderWindow;
@@ -235,7 +193,7 @@ void showVideo(char* path, int FPS) {
     iren->SetInteractorStyle(style);
     style->SetCurrentRenderer(renderer);
 
-    reader->SetFileName(videoDepthFileList[0].c_str());
+    reader->SetFileName(fileList[0].c_str());
     reader->Update();
 
     mapper->SetInputConnection(reader->GetOutputPort());
@@ -272,9 +230,6 @@ void showVideo(char* path, int FPS) {
     renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
     renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
     renderer->ResetCamera();
-    renderer->GetActiveCamera()->Azimuth(cameraHorizontalAngle);
-    renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
-    renderer->GetActiveCamera()->Zoom(cameraScale);
 
     renderWindow->Render();
 
@@ -282,16 +237,16 @@ void showVideo(char* path, int FPS) {
     scene->SetModeToSequence();
     scene->SetFrameRate(FPS);
     scene->SetStartTime(0);
-    scene->SetEndTime(numDepthFileScanned / FPS);
+    scene->SetEndTime(fileList[0].size() / FPS);
 
-    for (int frameIndex = 0; frameIndex < numDepthFileScanned; frameIndex++) {
+    for (int frameIndex = 0; frameIndex < fileList[0].size(); frameIndex++) {
         vtkNew<something::videoFrames> frame;
-        frame->filePath = videoDepthFileList[frameIndex];
+        frame->filePath = fileList[frameIndex];
         frame->reader = reader;
         frame->renderWindow = renderWindow;
         frame->SetTimeModeToNormalized();
-        frame->SetStartTime((double)(frameIndex / numDepthFileScanned));
-        frame->SetEndTime((double)((frameIndex + 1) / numDepthFileScanned));
+        frame->SetStartTime((double)(frameIndex / fileList[0].size()));
+        frame->SetEndTime((double)((frameIndex + 1) / fileList[0].size()));
         scene->AddCue(frame);
         //printf("Adding frame %d from %s\n", frameIndex+1, frame->filePath.c_str());
     }
@@ -301,44 +256,6 @@ void showVideo(char* path, int FPS) {
     //iren->Start();
 }
 
-// Reference: https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
-void scanFile(char* path) {
-    for (const auto& entry : filesystem::directory_iterator(path)) {
-        filesystem::path temp0 = entry.path();
-        std::string temp{temp0.u8string()};
-        const char* filePath = temp.c_str();
-        int len = strlen(filePath);
-        // Reference: https://stackoverflow.com/questions/5297248/how-to-compare-last-n-characters-of-a-string-to-another-string-in-c
-        const char* lastFourChar = &filePath[len - 4];
-
-        if (strcmp(lastFourChar, ".ply") == 0) {
-            isDepthFileFound = true;
-            numDepthFileScanned++;
-            videoDepthFileList.push_back(filePath);
-        }
-        if (strcmp(lastFourChar, ".jpg") == 0) {
-            isColorFileFound = true;
-            numColorFileScanned++;
-            videoColorFileList.push_back(filePath);
-        }
-        if (strcmp(lastFourChar, "json") == 0) {
-            const char* jsonFileName = &filePath[len - 16];
-            if (strcmp(jsonFileName, "cameraModel.json") == 0) {
-                isCameraProfileFound = true;
-                cameraProfilePath.push_back(filePath);
-            }
-            if (strcmp(jsonFileName, "videoConfig.json") == 0) {
-                isConfigFileFound = true;
-                configFilePath.push_back(filePath);
-            }
-        }
-    }
-    videoDepthFileList.shrink_to_fit();
-    videoColorFileList.shrink_to_fit();
-    cameraProfilePath.shrink_to_fit();
-    configFilePath.shrink_to_fit();
-}
-
 void something::KeyPressInteractorStyle::OnKeyPress() {
     // Get the keypress
     vtkRenderWindowInteractor* rwi = this->Interactor;
@@ -346,24 +263,26 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
 
     // Handle an arrow key
     if (key == "Up") {
-        cameraVerticalAngle += 5;
+        renderer->GetActiveCamera()->Elevation(5);
     }
     if (key == "Down") {
-        cameraVerticalAngle -= 5;
+        renderer->GetActiveCamera()->Elevation(-5);
     }
     if (key == "Left") {
-        cameraHorizontalAngle -= 5;
+        renderer->GetActiveCamera()->Azimuth(-5);
     }
     if (key == "Right") {
-        cameraHorizontalAngle += 5;
+        renderer->GetActiveCamera()->Azimuth(5);
     }
 
     // Handle a "normal" key
     if (key == "i") {
-        cameraScale += 0.5;
+        renderer->GetActiveCamera()->Zoom(1.5);
+        renderer->GetActiveCamera()->OrthogonalizeViewUp();
     }
     if (key == "o") {
-        cameraScale -= 0.5;
+        renderer->GetActiveCamera()->Zoom(0.5);
+        renderer->GetActiveCamera()->OrthogonalizeViewUp();
     }
     if (key == "a") {
         renderer->ResetCamera();
@@ -378,11 +297,13 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
         if (camClipSel == none)     printf("No plane selected. \n");
         else if (camClipSel == near)    cameraClippingRangeNear -= 0.5;
         else if (camClipSel == far)     cameraClippingRangeFar -= 0.5;
+        renderer->GetActiveCamera()->SetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
     }
     if (key == "p") {
         if (camClipSel == none)     printf("No plane selected. \n");
         else if (camClipSel == near)    cameraClippingRangeNear += 0.5;
         else if (camClipSel == far)     cameraClippingRangeFar += 0.5;
+        renderer->GetActiveCamera()->SetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
     }
     if (key == "c") {
         switch (camClipSel) {
@@ -407,16 +328,7 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
         isVideoPlaying = !isVideoPlaying;
     }
 
-    renderer->GetActiveCamera()->Azimuth(cameraHorizontalAngle);
-    renderer->GetActiveCamera()->Elevation(cameraVerticalAngle);
-    renderer->GetActiveCamera()->OrthogonalizeViewUp();
-    renderer->GetActiveCamera()->Zoom(cameraScale);
-    renderer->GetActiveCamera()->SetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
     renderWindow->Render();
-
-    cameraVerticalAngle = 0.0;
-    cameraHorizontalAngle = 0.0;
-    cameraScale = 1.0;
 
     if (videoMode) {
         if (isVideoPlaying)  scene->Play();
@@ -448,31 +360,6 @@ void plyMesh(char* srcFile, char* destPathAndFileName) {
     else writer->SetArrayName("RGB");
     writer->SetInputConnection(meshAlgo->GetOutputPort());
     writer->Write();
-}
-
-bool findInPLY(char* path, findMode type) {
-    bool result = false;
-    FILE* src = fopen(path, "rb+");
-    if (src == NULL) {
-        printf("File not exist. \n");
-        return false;
-    }
-    char* info;
-    info = (char*)malloc(100 * sizeof(char));
-    while (true) {
-        fgets(info, 100, src);      // Read until end of line or EOF, max reading char is set to 100
-        if (strncmp(info, "end_header", 10) == 0)   break;
-        if (type == alpha && strncmp(info, "property uchar alpha", 20) == 0) {
-            result = true;
-            break;
-        }
-        if (type == color && strncmp(info, "property uchar red", 18) == 0) {
-            result = true;
-            break;
-        }
-    }
-    fclose(src);
-    return result;
 }
 
 void dummyExperiment(char* plyPath) {

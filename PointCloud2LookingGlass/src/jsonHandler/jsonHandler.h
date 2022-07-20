@@ -1,7 +1,17 @@
 #pragma once
+#ifndef JSONHANDLER_H
+#define JSONHANDLER_H
+
 #define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+
+#include "../Util/Util.h"
+
 void newJSON(char*);
 void readJSON();
+
+#endif // !JSONHANDLER_H
+
+
 
 /*
 Path: same as executable file
