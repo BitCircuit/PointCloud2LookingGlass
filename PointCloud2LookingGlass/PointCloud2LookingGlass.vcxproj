@@ -19,11 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\jsonHandler\jsonHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\readPointCloudFile\plyReader.cpp" />
     <ClCompile Include="src\vtkHandler\vtkHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\jsonHandler\jsonHandler.h" />
+    <ClInclude Include="src\progressbar.hpp" />
     <ClInclude Include="src\readPointCloudFile\plyReader.h" />
     <ClInclude Include="src\vtkHandler\vtkHandler.h" />
   </ItemGroup>
