@@ -5,6 +5,7 @@
 #include "vtkNew.h"
 #include "vtkOpenGLRenderer.h"
 #include "vtkPLYReader.h"
+#include "vtkPLYWriter.h"
 #include "vtkJPEGReader.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
@@ -17,31 +18,30 @@
 #include "vtkAnimationScene.h"
 #include "vtkSmartPointer.h"
 
-#include "vtkImageQuantizeRGBToIndex.h"
-#include "vtkImageToPolyDataFilter.h"
-#include "vtkTriangleFilter.h"
-#include "vtkAppendPolyData.h"
+#include "vtkDelaunay2D.h"
 
 #include "stdio.h"
 
 #include "filesystem"
 #include "vector"
 
-//#include "rapidjson/document.h"
+#include "../progressbar.hpp"
 
 using namespace std;
-//using namespace rapidjson;
 
 // Some enum
 enum cameraClippingPlaneSelection { none, near, far };
 //enum fileScanTypes { config, profile, depth, colorJPG };
 enum singlePLYOperationModes {normal, calibration};
+enum findMode {alpha, color};
 
 // Some functions
 void singlePLYPlot(char*);
 void dummyExperiment(char*);
 void showVideo(char*, int);
 void scanFile(char*);
+void plyMesh(char*, char*);
+bool findInPLY(char*, findMode);
 //int TestTemporalFractal();
 
 // Some variables
@@ -56,6 +56,8 @@ vector<string> configFilePath;
 vector<string> cameraProfilePath;
 int numDepthFileScanned = 0, numColorFileScanned = 0;
 bool isDepthFileFound = false, isColorFileFound = false, isConfigFileFound = false, isCameraProfileFound = false;
+
+progressbar bar(100);
 
 
 namespace something{
@@ -108,6 +110,11 @@ void vtkHandler(char* argv[]) {
 }
 
 void singlePLYPlot(char* path) {
+    if (strlen(path) > 100) {
+        cout << "Input Path too long. \n" << endl;
+        return;
+    }
+
     singlePLYOperationMode = normal;
     
     vtkNew<vtkRenderer> renderer;
@@ -128,9 +135,34 @@ void singlePLYPlot(char* path) {
     iren->SetInteractorStyle(style);
     style->SetCurrentRenderer(renderer);
 
-    char* fileName = path;
-    reader->SetFileName(fileName);
+    reader->SetFileName(path);
     reader->Update();
+    if (reader->GetOutput()->GetNumberOfPolys() == 0) {
+        int i;
+        for (i = strlen(path); i > 0; i--) {
+            if (path[i - 1] == '\\' || path[i - 1] == '/') {
+                break;
+            }
+        }
+        //string currentFile[2];
+        char fileCurrentPath[100] = "asd";  // dummy initialization
+        char fileCurrentName[100] = "asd";
+        strncpy(fileCurrentPath, path, i);
+        fileCurrentPath[i] = '\0';
+        //cout << "The file path: " << fileCurrentPath << endl;
+        int x;
+        for (x = i; path[x] != '.'; x++)  fileCurrentName[x - i] = path[x];
+        fileCurrentName[x - i + 1] = '\0';
+        //cout << "The file name: " << fileCurrentName << endl;
+        char destFile[100] = "asd";
+        strncpy(destFile, path, i);
+        destFile[i] = '\0';
+        strcat(destFile, fileCurrentName);
+        strcat(destFile, "meshed.ply");
+        plyMesh(path, destFile);
+        reader->SetFileName(destFile);
+        reader->Update();
+    }
 
     mapper->SetInputConnection(reader->GetOutputPort());
     actor->SetMapper(mapper);
@@ -344,31 +376,31 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
     }
     if (key == "l") {
         if (camClipSel == none)     printf("No plane selected. \n");
-        else if (camClipSel == near)    cameraClippingRangeNear -= 1.0;
-        else if (camClipSel == far)     cameraClippingRangeFar -= 1.0;
+        else if (camClipSel == near)    cameraClippingRangeNear -= 0.5;
+        else if (camClipSel == far)     cameraClippingRangeFar -= 0.5;
     }
     if (key == "p") {
         if (camClipSel == none)     printf("No plane selected. \n");
-        else if (camClipSel == near)    cameraClippingRangeNear += 1.0;
-        else if (camClipSel == far)     cameraClippingRangeFar += 1.0;
+        else if (camClipSel == near)    cameraClippingRangeNear += 0.5;
+        else if (camClipSel == far)     cameraClippingRangeFar += 0.5;
     }
     if (key == "c") {
         switch (camClipSel) {
         case none:
             camClipSel = near;
-            printf("Camera Clipping Plane Near seleted.");
+            printf("Camera Clipping Plane Near selected.\n");
             break;
         case near:
             camClipSel = far;
-            printf("Camera Clipping Plane Far seleted.");
+            printf("Camera Clipping Plane Far selected.\n");
             break;
         case far:
             camClipSel = none;
-            printf("Camera Clipping Plane Unseleted.");
+            printf("Camera Clipping Plane Unselected.\n");
             break;
         default:
             camClipSel = none;
-            printf("Camera Clipping Plane Unseleted.");
+            printf("Camera Clipping Plane Unselected.\n");
         }
     }
     if (key == " ") {
@@ -401,6 +433,48 @@ void something::videoFrames::TickInternal(double currenttime, double deltatime, 
     renderWindow->Render();
 }
 
-void dummyExperiment(char* plyPath) {
+// It may lose normal/vector information
+void plyMesh(char* srcFile, char* destPathAndFileName) {
+    vtkNew<vtkPLYReader> reader;
+    reader->SetFileName(srcFile);
+    reader->Update();
+    vtkNew<vtkDelaunay2D> meshAlgo;
+    meshAlgo->SetInputData(reader->GetOutput());
+    meshAlgo->SetAlpha(0.075);
+    meshAlgo->Update();
+    vtkNew<vtkPLYWriter> writer;
+    writer->SetFileName(destPathAndFileName);
+    if (findInPLY(srcFile, alpha))   writer->SetArrayName("RGBA");
+    else writer->SetArrayName("RGB");
+    writer->SetInputConnection(meshAlgo->GetOutputPort());
+    writer->Write();
+}
 
+bool findInPLY(char* path, findMode type) {
+    bool result = false;
+    FILE* src = fopen(path, "rb+");
+    if (src == NULL) {
+        printf("File not exist. \n");
+        return false;
+    }
+    char* info;
+    info = (char*)malloc(100 * sizeof(char));
+    while (true) {
+        fgets(info, 100, src);      // Read until end of line or EOF, max reading char is set to 100
+        if (strncmp(info, "end_header", 10) == 0)   break;
+        if (type == alpha && strncmp(info, "property uchar alpha", 20) == 0) {
+            result = true;
+            break;
+        }
+        if (type == color && strncmp(info, "property uchar red", 18) == 0) {
+            result = true;
+            break;
+        }
+    }
+    fclose(src);
+    return result;
+}
+
+void dummyExperiment(char* plyPath) {
+    
 }
