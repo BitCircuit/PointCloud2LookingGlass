@@ -26,6 +26,7 @@
     <ClCompile Include="src\vtkHandler\vtkHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\jsonHandler\json.hpp" />
     <ClInclude Include="src\jsonHandler\jsonHandler.h" />
     <ClInclude Include="src\readPointCloudFile\plyReader.h" />
     <ClInclude Include="src\Util\progressbar.hpp" />

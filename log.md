@@ -263,3 +263,35 @@ could only generate point cloud without color information?
 >> Worry about what if the original file has alpha data (transparent). That would need to be `"RGBA"` (guess from `vtkPLYReader` source code). Need a method to read if there is alpha value. Write a simplified version of `plyReader` just to determine if there is color and alpha value. 
 
 - In `Realistic 3D Face Reconstruction Based on VTK and MFC`, `vtkTexture` is mentioned, which may map color on polydata. After running the example code `ProjectedTexture`, points are painted with color, but they are mismatched. Guess this is where the camera's parameter data is used.  
+
+## Jul. 20, 2022
+- Reconstructed my code to reduce redundence and improve readability and reusability. 
+> 1. Put reuseable methods to Util.cpp, and make the method more general (i.e. `isPathAFile` can be used in both `vtkHandler` and `jsonHandler`)
+> 2. Put VTK pipeline creation code seperatly as they are reused. 
+> 3. Since the method `showVideo` also needs to intake `singlePLYPlot` conditionally, thinking to make `singlePLYPlot` reusable. 
+- Used `MindGenius` to help me build program flowchart (kind of).
+- Construted config mechanism (read/write JSON file with library `RapidJSON`) to record camera position (default or overriden by last time run) and if a file has meshed. To let animation load correct camera position and play. (interactor module does not work while animation is playing, therefore we can not change camera setting in animation)
+- The code is failed to be compiled after reconstructing. Shows linker error because of multi definition. 
+
+## Jul. 21, 2022
+- To prevent multi definition, namespace is used. 
+- Later found out that there are multi definition even namespace is used, because I put variables in header. To solve, I put them in source, and created get method to return the local variable. 
+### jsonHandler
+- Combined sample code from http://rapidjson.org/md_doc_stream.html#OStreamWrapper and https://github.com/Tencent/rapidjson/blob/master/example/simplewriter/simplewriter.cpp to create `profileCamera.json`. Need to modify a bit, such as creating two writers, one for StringBuffer, and another one for ofstream. 
+- There are lots of compiler deprecation warnings exists in `RapidJSON` library. With defination of `_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING`, there is one warning that cannot be eliminated. Consider changing to another library. 
+- Changed to `nlohmann/json` (https://github.com/nlohmann/json). The reader and writer process seems more stright and easy. 
+
+## Jul. 24, 2022 (better to explain in flowchart)
+- While writing code for creating/loading/updating JSON file, keep in mind:
+> 1. variables need to update:
+>> a. finalReaderPath: set found one. if not, if single file, check mashed. 
+>> b. finalConfigFileName: if config file exists, update it to current. If not, if video, set it fixed to be `videoConfig.json` in media directory. If single file, keep it with same name as ply file. if not meshed, append `mashed` into filename. 
+>> c. finalProfileName: is being updated in `isNewProfileCreated` only, where users choose or create profile. 
+>> d. camera settings: update not only json config data, but also camera values which interactor uses. 
+>
+> 2. if video meshed, refresh list
+
+- Met an error that vtk shows could not load ply file, but later the PLY is plotted. By printing flag 1 & 2, the error is located. `camera settings from json` has to be performed after reader is updated with a ply file. 
+- Code works for single PLY file. However, for directory, there is an error. With debugger, the variable viewer shows that my `pathParser` was not able to solve if path itself is a directory (after parsing, the result has the upper directory information). Consider comparing with file format first to see if path represent as a file. If not, just copy the whole path to result.directory. 
+- `vtkPLYWriter` cannot make directory automatically. Searching online for doing it manually. 
+- Followed another sample code online `RotatingSphere`, created a timer callback function to update reader index, and render new frame each time it is called. Confirmed that maybe reader and render takes long time to complete (a 4 second video, 141 frames (4 MB per raw point cloud), took about 50 mins to construct face (10 MB per meshed file) and 2 mins to play). Homever, this method enables interactor mode in video mode. Considering to pre-load frames into memory and play. 

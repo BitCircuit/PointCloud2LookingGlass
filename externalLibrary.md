@@ -35,6 +35,12 @@
 - Version: 1.1.0
 - Mandatory Dependencies: CMake
 
+## JSON for Modern C++
+- URL: https://github.com/nlohmann/json
+- MIT License
+- Version: 3.10.5
+- 
+
 ## Progress Bar
 - URL: https://github.com/gipert/progressbar
 - MIT License

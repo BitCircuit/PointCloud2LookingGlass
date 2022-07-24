@@ -1,34 +1,56 @@
 #pragma once
+//#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+
 #ifndef JSONHANDLER_H
 #define JSONHANDLER_H
 
-#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-
 #include "../Util/Util.h"
 
-void newJSON(char*);
-void readJSON();
+#include "json.hpp"
+using json = nlohmann::json;
+
+namespace jsonHandler {
+
+	struct profileCamera {
+		double defaultCameraPosition[3];
+		double defaultViewUpVector[3];
+	};
+	struct mediaConfig {
+		string source;
+		string mediaType;
+		int FPS;				// available if mediaType == "video", default to 30
+		bool hasColor;
+		bool isSrcHasFaceEmbed;
+
+		double clippingRange[2];
+		double windowCenter[2];
+		double viewAngle;
+
+		bool overrideEnable;
+		double overrideCameraPosition[3];
+		double overrideViewUp[3];
+	};
+
+	void to_json(json&, const profileCamera&);
+	void from_json(const json&, profileCamera&);
+	void to_json(json&, const mediaConfig&);
+	void from_json(const json&, mediaConfig&);
+};
 
 #endif // !JSONHANDLER_H
 
-
-
 /*
 Path: same as executable file
-profileCamera.json
+profileSource.json
 {
-	// Online means the file is downloaded from online, no need to set default values
-	"knownModels" : ["Kinect", "RealSense", "Record3D", "Heges", "Online"], 
-	"KinectProfile" : "profileKinect.json"			// act as path
-	// ... same for other models
+	// Online means the file is downloaded from online
+	"knownSource" : ["Kinect", "RealSense", "Record3D", "Heges", "Online"]
 }
 
-profileKinect.json
+profile_kinect.json
 {
 	"cameraPosition" : [1.0, 0.0, 0.0],
-	"focalPoint" : [0.0, 0.0, 0.0],
-	"viewUp" : [0.0, 0.0, 1.0], 
-	"clippingRange" : [0.1, 0.1]
+	"viewUp" : [0.0, 0.0, 1.0]
 }
 */
 
@@ -36,39 +58,36 @@ profileKinect.json
 Path: same as bunch of original PLY
 videoConfig.json
 {
-	"cameraModel" : "Kinect", 
-	"overrideCameraPosition" : [1.0, 0.0, 0.0],		// Not included in new JSON, only added if camera changed
-	"overrideFocalPoint" : [0.0, 0.0, 0.0],			// Not included in new JSON, only added if camera changed
-	"overrideViewUp" : [0.0, 0.0, 1.0],				// Not included in new JSON, only added if camera changed
-	"overrideClippingRange" : [0.1, 0.1],			// Not included in new JSON, only added if camera changed
+	"source" : "Kinect", 
 	"FPS" : 30,
 	"hasColor" : true,
 	"isSrcHasFaceEmbed" : false,		// update 
-	"meshedPLYPath" : "path"			// if isSrcHasFaceEmbed == false
+	"clippingRange" : [0.1, 0.1],
+	"overrideCameraPosition" : [1.0, 0.0, 0.0],		// Not included in new JSON, only added if camera changed
+	"overrideViewUp" : [0.0, 0.0, 1.0]				// Not included in new JSON, only added if camera changed
 }
 */
 
 /*
-For unrelated PLY files:
+For single PLY file:
 Name: same as ply file
 For ply downloaded from online:
 {
-	"cameraModel" : "Online", 
+	"source" : "Online", 
+	"hasColor" : true,
+	"isSrcHasFaceEmbed" : false,		// update
+	"clippingRange" : [0.1, 0.1],
 	"overrideCameraPosition" : [1.0, 0.0, 0.0],		// Not included in new JSON, only added if camera changed
-	"overrideFocalPoint" : [0.0, 0.0, 0.0],			// Not included in new JSON, only added if camera changed
-	"overrideViewUp" : [0.0, 0.0, 1.0],				// Not included in new JSON, only added if camera changed
-	"overrideClippingRange" : [0.1, 0.1],			// Not included in new JSON, only added if camera changed
+	"overrideViewUp" : [0.0, 0.0, 1.0]				// Not included in new JSON, only added if camera changed
 }
 
 For ply get from camera:
 {
-	"cameraModel" : "Kinect", 
-	"overrideCameraPosition" : [1.0, 0.0, 0.0],		// Not included in new JSON, only added if camera changed
-	"overrideFocalPoint" : [0.0, 0.0, 0.0],			// Not included in new JSON, only added if camera changed
-	"overrideViewUp" : [0.0, 0.0, 1.0],				// Not included in new JSON, only added if camera changed
-	"overrideClippingRange" : [0.1, 0.1],			// Not included in new JSON, only added if camera changed
+	"source" : "Kinect", 
 	"hasColor" : true,
 	"isSrcHasFaceEmbed" : false,		// update
-	"meshedPLYPath" : "path"			// if isSrcHasFaceEmbed == false
+	"clippingRange" : [0.1, 0.1],
+	"overrideCameraPosition" : [1.0, 0.0, 0.0],		// Not included in new JSON, only added if camera changed
+	"overrideViewUp" : [0.0, 0.0, 1.0]				// Not included in new JSON, only added if camera changed
 }
 */

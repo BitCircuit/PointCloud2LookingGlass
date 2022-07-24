@@ -47,6 +47,9 @@
     <ClInclude Include="src\Util\progressbar.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\jsonHandler\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\readPointCloudFile\README.md">
