@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
     }
     else {
         if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) usage();
-        else if (strcmp(argv[1], "-c") == 0) ;      // call cameraHandler(); or pclHandler(); 
+        else if (strcmp(argv[1], "-c") == 0);      // call cameraHandler(); or pclHandler(); 
         else    vtkHandler::vtkHandler(argv);
     }
 #ifdef osWindows

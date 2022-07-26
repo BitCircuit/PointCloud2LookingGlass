@@ -19,6 +19,10 @@
 #include "iostream"
 #include "String.h"
 #include "tuple"
+#include <chrono>
+#include <thread>
+#include "future"
+#include "ctime"
 #include "progressbar.hpp"
 
 using namespace std;

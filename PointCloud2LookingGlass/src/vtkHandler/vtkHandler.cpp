@@ -5,6 +5,7 @@ enum saveJSONMode { config, profile };
 
 double cameraClippingRangeNear = 0.0, cameraClippingRangeFar = 0.0;
 double cameraViewAngle = 0.0, cameraWindowCenter[2] = { 0.0, 0.0 };
+int actualThreads = thread::hardware_concurrency() * 2 / 3;
 singlePLYOperationModes singlePLYOperationMode = normal;
 bool newProfileCreated = false, newConfigCreated = false, defaultValueUpdate = false;
 string finalReaderPath;
@@ -19,14 +20,7 @@ Util::pathResult programPath;
 jsonHandler::profileCamera jsonProfileData;
 jsonHandler::mediaConfig jsonConfigData;
 
-vtkNew<vtkPLYReader> reader;
-vtkNew<vtkPolyDataMapper> mapper;
-vtkNew<vtkActor> actor;
-vtkNew<vtkRenderer> renderer;
-vtkNew<vtkRenderWindow> renderWindow;
-
 void singlePLYPlot();
-void dummyExperiment(const char*);
 void showVideo(int);
 void plyMesh(const char*, const char*);
 void generalPipeline();
@@ -36,6 +30,7 @@ void saveCameraSettingsToJSON(string, saveJSONMode);
 void loadCameraSettingsFromJSON();
 void initializeConfig();
 void configHandler();
+void multithreadRequest();
 
 namespace something {
     // Define interaction style
@@ -75,20 +70,40 @@ namespace something {
         {
             vtkTimerCallback2* cb = new vtkTimerCallback2;
             cb->TimerCount = 0;
+            cb->allActors = cb->renderer->GetActors();
+            cb->nextActor = nullptr;
+            cb->previousActor = nullptr;
+            cb->allActors->InitTraversal(cb->actorIndex);
             return cb;
         }
         virtual void Execute(vtkObject* caller, unsigned long eventId,
             void* vtkNotUsed(callData));
     private:
         int TimerCount = 0;
+        vtkActorCollection* allActors;
+        vtkCollectionSimpleIterator actorIndex;
+        vtkActor* nextActor;
+        vtkActor* previousActor;
 
     public:
         vtkPLYReader* reader;
+        vtkRenderer* renderer;
         vtkRenderWindow* renderWindow;
+        
     };
     //vtkStandardNewMacro(vtkTimerCallback2);
 }
 
+vtkNew<vtkPLYReader> reader;
+vtkNew<vtkPolyDataMapper> mapper;
+vtkNew<vtkActor> actor;
+vtkNew<vtkRenderer> renderer;
+vtkNew<vtkRenderWindow> renderWindow;
+vtkNew<vtkRenderWindowInteractor> iren;
+vtkNew<something::KeyPressInteractorStyle> style;
+vtkNew<vtkActorCollection> allActors;
+
+time_t result = time(nullptr);
 
 void interactorUsage() {
     printf("----------Interactor Usage----------\n");
@@ -128,34 +143,51 @@ void vtkHandler::vtkHandler(char* path[]) {
 }
 
 void singlePLYPlot() {
-    vtkNew<vtkRenderWindowInteractor> iren;
-    vtkNew<something::KeyPressInteractorStyle> style;
-
-    style->renderer = renderer;
-    style->renderWindow = renderWindow;
-
-    iren->SetRenderWindow(renderWindow);
-    iren->SetInteractorStyle(style);
-    style->SetCurrentRenderer(renderer);
-
     renderWindow->Render();
     iren->Start();
-
     renderWindow->Finalize();
 }
 
 void showVideo(int FPS) {
-    vtkNew<vtkRenderWindowInteractor> iren;
-    vtkNew<something::KeyPressInteractorStyle> style;
-
-    style->renderer = renderer;
-    style->renderWindow = renderWindow;
-    //generalPipeline();
-
-    iren->SetRenderWindow(renderWindow);
-    iren->SetInteractorStyle(style);
-    style->SetCurrentRenderer(renderer);
-
+    renderer->RemoveActor(actor);
+    
+    int progressPreviousPercent = 0;
+    int percent = 0, progress = 0;
+    progressbar bar(100);
+    bar.reset();
+    bar.update();       // initial 0%
+    for (int i = 0; i < videoFileList.size(); i++) {
+        vtkNew<vtkPLYReader> reader;
+        vtkNew<vtkPolyDataMapper> mapper;
+        vtkNew<vtkActor> actor;
+        //cout << chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count() << ": Reading file " << i << endl;
+        reader->SetFileName(videoFileList[i].c_str());
+        reader->Update();
+        mapper->SetInputConnection(reader->GetOutputPort());
+        actor->SetMapper(mapper);
+        actor->VisibilityOff();
+        allActors->AddItem(actor);
+        progress++;
+        // progress bar
+        percent = progress * 100 / videoFileList.size();
+        if (percent > progressPreviousPercent) {
+            bar.update();
+            progressPreviousPercent = percent;  // update
+        }
+    }
+    
+    allActors->InitTraversal();
+    for (int i = 0; i < allActors->GetNumberOfItems(); i++) {
+        vtkActor* anActor = allActors->GetNextActor();
+        //anActor->VisibilityOff();
+        anActor->VisibilityOn();
+        renderer->AddActor(anActor);
+        renderWindow->Render();
+        this_thread::sleep_for(chrono::milliseconds(1000/FPS));
+        anActor->VisibilityOff();
+    }
+    
+    /*
     renderWindow->Render();
 
     // Initialize must be called prior to creating timer events.
@@ -164,6 +196,7 @@ void showVideo(int FPS) {
     // Sign up to receive TimerEvent
     vtkNew<something::vtkTimerCallback2> cb;
     cb->reader = reader;
+    cb->renderer = renderer;
     cb->renderWindow = renderWindow;
 
     iren->AddObserver(vtkCommand::TimerEvent, cb);
@@ -172,6 +205,8 @@ void showVideo(int FPS) {
 
     // Start the interaction and timer
     iren->Start();
+    */
+    
     renderWindow->Finalize();
 }
 
@@ -332,6 +367,11 @@ void generalPipeline() {
     actor->SetMapper(mapper);
     renderer->AddActor(actor);
     renderWindow->AddRenderer(renderer);
+    style->renderer = renderer;
+    style->renderWindow = renderWindow;
+    iren->SetRenderWindow(renderWindow);
+    iren->SetInteractorStyle(style);
+    style->SetCurrentRenderer(renderer);
 }
 
 void lookingGlassPipeline() {
@@ -456,6 +496,7 @@ void initializeConfig() {
                     progressPreviousPercent = percent;  // update
                 }
             }
+            cout << endl;       // give a newline when bar.update reaches 100
             // rescan for meshed
             videoFileList = Util::scanFileByType(destDir.c_str(), ".ply");
             finalReaderPath = videoFileList[0];
@@ -620,10 +661,6 @@ void configHandler() {
     }
 }
 
-void dummyExperiment(char* plyPath) {
-    
-}
-
 void something::vtkTimerCallback2::Execute(vtkObject* caller, unsigned long eventId,
     void* vtkNotUsed(callData)) {
     vtkRenderWindowInteractor* iren =
@@ -634,12 +671,148 @@ void something::vtkTimerCallback2::Execute(vtkObject* caller, unsigned long even
     }
     if (TimerCount < videoFileList.size())
     {
-        reader->SetFileName(videoFileList[TimerCount].c_str());
-        reader->Update();
-        iren->GetRenderWindow()->Render();
+        previousActor = allActors->GetLastActor();
+        previousActor->VisibilityOff();
+        nextActor = allActors->GetNextActor(actorIndex);
+        nextActor->VisibilityOn();
     }
     else
     {
         iren->DestroyTimer();
     }
 }
+
+void threadProcedure(int i, int j, promise<vtkActor*> promiseRes) {
+    vtkNew<vtkPLYReader> readerVecMember;
+    vtkNew<vtkPolyDataMapper> mapperVecMember;
+    vtkNew<vtkActor> actorVecMember;
+    readerVecMember->SetFileName(videoFileList[i + j].c_str());
+    readerVecMember->Update();
+    mapperVecMember->SetInputConnection(readerVecMember->GetOutputPort());
+    actorVecMember->SetMapper(mapperVecMember);
+    actorVecMember->VisibilityOff();
+    promiseRes.set_value(actorVecMember);
+}
+
+void multithreadRequest() {
+    vector<vtkActor*> actorVec;
+    vector<thread> threadList;
+    vector<future<vtkActor*>> futureVec;
+    vtkNew<vtkActorCollection> allActors;
+    int progressPreviousPercent = 0;
+    int percent = 0, progress = 0;
+    progressbar bar(100);
+    bar.reset();
+    bar.update();       // initial 0%
+    for (int i = 0; i < videoFileList.size(); i += actualThreads) {
+        int threadCount = actualThreads;
+        int temp = videoFileList.size() - 1 - i;
+        if (temp < actualThreads)    threadCount = temp;
+        
+        for (int j = 0; j < threadCount; j++) {
+            promise<vtkActor*> promise;
+            futureVec.push_back(promise.get_future());
+            threadList.push_back(thread(threadProcedure, i, j, move(promise)));
+        }
+
+        for (std::thread& th : threadList) {
+            th.join();
+            progress++;
+            // progress bar
+            percent = progress * 100 / videoFileList.size();
+            if (percent > progressPreviousPercent) {
+                bar.update();
+                progressPreviousPercent = percent;  // update
+            }
+        }
+        for (int j = 0; j < threadCount; j++)       actorVec.push_back(futureVec[j].get());
+        for (int j = 0; j < threadCount; j++)       allActors->AddItem(actorVec[j]);
+        
+        futureVec.clear();
+        threadList.clear();
+    }
+    cout << endl;       // give a newline when bar.update reaches 100
+
+}
+/*
+void threadOp(int i, vtkActor* newActor) {
+    vtkNew<vtkPLYReader> readerVecMember;
+    vtkNew<vtkPolyDataMapper> mapperVecMember;
+    vtkNew<vtkActor> actorVecMember;
+    readerVecMember->SetFileName(videoFileList[i].c_str());
+    readerVecMember->Update();
+    mapperVecMember->SetInputConnection(readerVecMember->GetOutputPort());
+    actorVecMember->SetMapper(mapperVecMember);
+    actorVecMember->VisibilityOff();
+    newActor = actorVecMember;
+}
+
+void vtkHandler::dummyExperiment(const char* path) {
+    vtkNew<vtkActor> actor1;
+    vtkNew<vtkActor> actor2;
+    vtkNew<vtkActor> actor3;
+    vtkNew<vtkActor> actor4;
+    vtkNew<vtkActor> actor5;
+    vtkNew<vtkActor> actor6;
+    vtkNew<vtkActor> actor7;
+    vtkNew<vtkActor> actor8;
+    //vector<vtkActor*> actors;
+    vector<thread> threadList;
+
+    int progressPreviousPercent = 0;
+    int percent = 0, progress = 0;
+    progressbar bar(100);
+    bar.reset();
+    bar.update();       // initial 0%
+    for (int i = 0; i < videoFileList.size(); i += actualThreads) {
+        int threadCount = actualThreads;
+        int temp = videoFileList.size() - 1 - i;
+        if (temp < actualThreads)    threadCount = temp;
+        //actors.resize(threadCount);
+        //for (int j = 0; j < threadCount; j++) {
+            thread th1(threadOp, i, actor1);
+            thread th2(threadOp, i, actor2);
+            thread th3(threadOp, i, actor3);
+            thread th4(threadOp, i, actor4);
+            thread th5(threadOp, i, actor5);
+            thread th6(threadOp, i, actor6);
+            thread th7(threadOp, i, actor7);
+            thread th8(threadOp, i, actor8);
+        //}
+
+        //for (std::thread& th : threadList) {
+            th1.join();
+            th2.join();
+            th3.join();
+            th4.join();
+            th5.join();
+            th6.join();
+            th7.join();
+            th8.join();
+            progress += 8;
+            // progress bar
+            percent = progress * 100 / videoFileList.size();
+            if (percent > progressPreviousPercent) {
+                bar.update();
+                progressPreviousPercent = percent;  // update
+            }
+        //}
+        //for (int j = 0; j < threadCount; j++)       actorVec.push_back(futureVec[j].get());
+        //for (int j = 0; j < threadCount; j++)       allActors->AddItem(actors[j]);
+        allActors->AddItem(actor1);
+        allActors->AddItem(actor2);
+        allActors->AddItem(actor3);
+        allActors->AddItem(actor4);
+        allActors->AddItem(actor5);
+        allActors->AddItem(actor6);
+        allActors->AddItem(actor7);
+        allActors->AddItem(actor8);
+
+        //futureVec.clear();
+        threadList.clear();
+    }
+    cout << endl;       // give a newline when bar.update reaches 100
+
+
+}
+*/

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\cameraHandler\cameraHandler.cpp" />
     <ClCompile Include="src\jsonHandler\jsonHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\readPointCloudFile\plyReader.cpp" />
@@ -26,6 +27,7 @@
     <ClCompile Include="src\vtkHandler\vtkHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\cameraHandler\cameraHandler.h" />
     <ClInclude Include="src\jsonHandler\json.hpp" />
     <ClInclude Include="src\jsonHandler\jsonHandler.h" />
     <ClInclude Include="src\readPointCloudFile\plyReader.h" />
