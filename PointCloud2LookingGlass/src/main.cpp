@@ -2,6 +2,7 @@
 //#include "Util/Util.h"
 #include "vtkHandler/vtkHandler.h"
 #include "jsonHandler/jsonHandler.h"
+#include "cameraHandler/cameraHandler.h"
 
 void usage() {
     printf("----------Main Usage----------\n");
@@ -22,7 +23,7 @@ int main(int argc, char* argv[]) {
     }
     else {
         if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) usage();
-        else if (strcmp(argv[1], "-c") == 0);      // call cameraHandler(); or pclHandler(); 
+        else if (strcmp(argv[1], "-c") == 0)        cameraHandler::cameraHandler(argv[2]);
         else    vtkHandler::vtkHandler(argv);
     }
 #ifdef osWindows

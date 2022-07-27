@@ -310,3 +310,6 @@ could only generate point cloud without color information?
 - After trying, the debugger shows a 4.7 second video sample took 2.8 GB memory after loading (141 frames with 10 MB per frame, and took 3 mins and 15 seconds to load files with 1 thread). Even the thread sleep timer has set correctly, the playing time took about 30 seconds to complete. The memory it occupied ended at 3 GB. Maybe it is not optimal to play video?
 - Multithreading is still not working as `vtkActor` or `vtkActorCollection` don't take result from threads (transferring data by using `promise` and `future`). The error just shows it is a null pointer (when the program runs to `vtkCollection` file and adding the actor. 
 - Except I can export frame files to `.mp4` format and play it using `HoloPlay Studio`, I need to study how to compress video maybe? or figure out to reduce the bitrate. Normal bitrate for 1080P at 30 FPS should range 3000 - 6000 Kbps. The sample I have should probably be 240 Mbps (if the equation is 10 MB/frame * 30 FPS * 8 bit/Byte).
+### Camera Integration
+- NOTE: Download `point cloud library` from release page of their Github. DO NOT install from vcpkg as their official webpage shows (OpenNI wrapper will not be included). 
+- 

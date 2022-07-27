@@ -29,6 +29,7 @@ namespace vtkHandler {
 
 	void vtkHandler(char**);
 	void dummyExperiment(const char*);
+	void pclInterface(vtkPolyData*);
 	
 };
 

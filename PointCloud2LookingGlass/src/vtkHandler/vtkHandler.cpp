@@ -682,6 +682,27 @@ void something::vtkTimerCallback2::Execute(vtkObject* caller, unsigned long even
     }
 }
 
+void vtkHandler::pclInterface(vtkPolyData* inputData) {
+    vtkNew<vtkPolyDataMapper> mapper;
+    mapper->SetInputData(inputData);
+    vtkNew<vtkActor> actor;
+    actor->SetMapper(mapper);
+    vtkNew<vtkRenderer> renderer;
+    renderer->AddActor(actor);
+    vtkNew<vtkRenderWindow> renderWindow;
+    renderWindow->AddRenderer(renderer);
+    vtkNew<vtkRenderWindowInteractor> iren;
+    vtkNew<something::KeyPressInteractorStyle> style;
+    style->renderer = renderer;
+    style->renderWindow = renderWindow;
+    iren->SetRenderWindow(renderWindow);
+    iren->SetInteractorStyle(style);
+    style->SetCurrentRenderer(renderer);
+    renderWindow->Render();
+    iren->Start();
+    renderWindow->Finalize();
+}
+
 void threadProcedure(int i, int j, promise<vtkActor*> promiseRes) {
     vtkNew<vtkPLYReader> readerVecMember;
     vtkNew<vtkPolyDataMapper> mapperVecMember;
