@@ -11,7 +11,6 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
 
-#include "pcl/io/real_sense_2_grabber.h"
 #include "pcl/surface/vtk_smoothing/vtk_utils.h"
 #include "../vtkHandler/vtkHandler.h"
 
@@ -54,21 +53,6 @@ public:
 
         // stop the grabber
         interface->stop();
-    }
-};
-
-class realSenseCamera {
-public:
-    void cloud_cb_(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr& cloud) {
-        
-        //vtkHandler::pclInterface(cloud);
-    }
-
-    void run(char* deviceID) {
-        pcl::RealSense2Grabber* cameraInterface = new pcl::RealSense2Grabber(deviceID);
-
-        std::function<pcl::RealSense2Grabber::signal_librealsense_PointXYZRGBA> f =
-            [this](const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr& cloud) { cloud_cb_(cloud); };
     }
 };
 
@@ -128,7 +112,7 @@ void cameraHandler::cameraHandler(char* deviceID) {
     std::vector<int> states = gp3.getPointStates();
     
     vtkSmartPointer<vtkPolyData> polydata;
-    pcl::VTKUtils::mesh2vtk(triangles, polydata);
-    //vtkHandler::pclInterface(polydata);
+    pcl::VTKUtils::convertToVTK(triangles, polydata);
+    vtkHandler::pclInterface(polydata);
     
 }

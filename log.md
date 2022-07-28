@@ -312,4 +312,24 @@ could only generate point cloud without color information?
 - Except I can export frame files to `.mp4` format and play it using `HoloPlay Studio`, I need to study how to compress video maybe? or figure out to reduce the bitrate. Normal bitrate for 1080P at 30 FPS should range 3000 - 6000 Kbps. The sample I have should probably be 240 Mbps (if the equation is 10 MB/frame * 30 FPS * 8 bit/Byte).
 ### Camera Integration
 - NOTE: Download `point cloud library` from release page of their Github. DO NOT install from vcpkg as their official webpage shows (OpenNI wrapper will not be included). 
-- 
+
+## Jul. 27, 2022
+- Intalled `point cloud library` from all-in-one installer provided on github page. 
+- Tried sample code for `point cloud library`. Found out even it is `all-in-one` it doesn't include `realsense2` wrapper. 
+- Considering how to pass data from pcl to vtk. As `pcl::openni` wrapper would provide point cloud in XYZRGB, it does not provide face construction. 
+- Tried other sample code such as fast triangle as it could output mesh data. 
+- Wrote an interface method in vtkHandler to accept data from pcl. 
+- Run code with debugger. There was an error from vtk garbage collector shows read access denied. Consider maybe the VTK version were not matched. (PCL installer has VTK 9.1, but the VTK I built is 9.2)
+- Tried to build vtk 9.1 (git clone needs to add `-b "v9.1.0" --single-branch` to clone version 9.1)
+- While compiling vtk 9.1, vtkLookingGlassModule (the most important one in this project) has failed. 
+- Tried to build PCL. Compiler said there were lots of project build failed.
+- Kept trying to build both library with some random modifications, but all failed.  
+
+## Jul. 28. 2022
+- Organized `PATH` environment. CMake now can find dependencies automatically. Yesterday I had to manuallly direct libraries and directory to CMake variables each time I tried to build libraries. 
+> 1. When CMake asked for library, most likely it asks for .lib static library file. Only provide .dll dynamic library file if .lib is not presented. 
+> 2. When CMake askd for directory (not for include directory), most likely it asks for directory contains CMake config files of that dependency. 
+- Re-cmake both library. 
+- While compiling PCL, compiler reported `boost` has x86 version, but x64 version of PCL is being built. 
+- After using `vcpkg` to install dependencies in 64 bit (set `VCPKG_DEFAULT_TRIPLET = x64-windows` in system variables), re-organized `PATH` environment, and rebuilt PCL in 64 bit. 
+- After test, PCL and VTK can work together. 
