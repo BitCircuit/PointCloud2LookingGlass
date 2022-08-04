@@ -1,12 +1,10 @@
 #include "vtkHandler.h"
 
-enum singlePLYOperationModes { normal, calibration };
 enum saveJSONMode { config, profile };
 
 double cameraClippingRangeNear = 0.0, cameraClippingRangeFar = 0.0;
-double cameraViewAngle = 0.0, cameraWindowCenter[2] = { 0.0, 0.0 };
+double cameraViewAngle = 0.0, cameraWindowCenter[2] = { 0.0, 0.0 }, cameraFocalDistance = 0.0;
 int actualThreads = thread::hardware_concurrency() * 2 / 3;
-singlePLYOperationModes singlePLYOperationMode = normal;
 bool newProfileCreated = false, newConfigCreated = false, defaultValueUpdate = false;
 string finalReaderPath;
 string finalConfigFileName;
@@ -40,7 +38,7 @@ namespace something {
         vtkTypeMacro(KeyPressInteractorStyle, vtkInteractorStyleTrackballCamera);
         vtkRenderer* renderer;
         vtkRenderWindow* renderWindow;
-        enum cameraClippingPlaneSelection { none, near, far };
+        enum cameraClippingPlaneSelection { none, near, far, focalpoint };
         cameraClippingPlaneSelection camClipSel = none;
         //jsonHandler::profileCamera* jsonProfileData;
         virtual void OnKeyPress() override;
@@ -281,11 +279,13 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
         if (camClipSel == none)     printf("No plane selected. \n");
         else if (camClipSel == near)    cameraClippingRangeNear -= 0.5;
         else if (camClipSel == far)     cameraClippingRangeFar -= 0.5;
+        else if (camClipSel == focalpoint)  cameraFocalDistance -= 0.1;
     }
     if (key == "p") {
         if (camClipSel == none)     printf("No plane selected. \n");
         else if (camClipSel == near)    cameraClippingRangeNear += 0.5;
-        else if (camClipSel == far)     cameraClippingRangeFar += 0.5;
+        else if (camClipSel == far)     cameraClippingRangeFar += 0.5; 
+        else if (camClipSel == focalpoint)  cameraFocalDistance += 0.1;
     }
     if (key == "c") {
         switch (camClipSel) {
@@ -298,6 +298,10 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
             printf("Camera Clipping Plane Far selected.\n");
             break;
         case far:
+            camClipSel = focalpoint;
+            printf("Camera Focal Point Selected.\n");
+            break;
+        case focalpoint:
             camClipSel = none;
             printf("Camera Clipping Plane Unselected.\n");
             break;
@@ -325,12 +329,14 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
         renderer->ResetCamera();
         renderer->GetActiveCamera()->GetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
         cameraViewAngle = renderer->GetActiveCamera()->GetViewAngle();
-        renderer->GetActiveCamera()->GetWindowCenter(cameraWindowCenter[0], cameraWindowCenter[1]);
+        renderer->GetActiveCamera()->GetWindowCenter(cameraWindowCenter);
+        cameraFocalDistance = renderer->GetActiveCamera()->GetDistance();
     }
     else {
         renderer->GetActiveCamera()->SetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
         renderer->GetActiveCamera()->SetViewAngle(cameraViewAngle);
         renderer->GetActiveCamera()->SetWindowCenter(cameraWindowCenter[0], cameraWindowCenter[1]);
+        renderer->GetActiveCamera()->SetDistance(cameraFocalDistance);
     }
 
     renderWindow->Render();
@@ -540,13 +546,14 @@ void loadCameraSettingsFromJSON() {
         renderer->GetActiveCamera()->GetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
         cameraViewAngle = renderer->GetActiveCamera()->GetViewAngle();
         renderer->GetActiveCamera()->GetWindowCenter(cameraWindowCenter);
+        cameraFocalDistance = renderer->GetActiveCamera()->GetDistance();
         
         jsonConfigData.clippingRange[0] = cameraClippingRangeNear;
         jsonConfigData.clippingRange[1] = cameraClippingRangeFar;
         jsonConfigData.viewAngle = cameraViewAngle;
-        jsonConfigData.windowCenter[0] = jsonConfigData.clippingRange[0];
-        jsonConfigData.windowCenter[1] = jsonConfigData.clippingRange[1];
-        
+        jsonConfigData.windowCenter[0] = cameraWindowCenter[0];
+        jsonConfigData.windowCenter[1] = cameraWindowCenter[1];
+        jsonConfigData.focalDistance = cameraFocalDistance;
     }
     else {      // struct -> camera values -> camera
         cameraClippingRangeNear = jsonConfigData.clippingRange[0];
@@ -554,10 +561,12 @@ void loadCameraSettingsFromJSON() {
         cameraViewAngle = jsonConfigData.viewAngle;
         cameraWindowCenter[0] = jsonConfigData.windowCenter[0];
         cameraWindowCenter[1] = jsonConfigData.windowCenter[1];
+        cameraFocalDistance = jsonConfigData.focalDistance;
 
         renderer->GetActiveCamera()->SetClippingRange(cameraClippingRangeNear, cameraClippingRangeFar);
         renderer->GetActiveCamera()->SetViewAngle(cameraViewAngle);
         renderer->GetActiveCamera()->SetWindowCenter(cameraWindowCenter[0], cameraWindowCenter[1]);
+        renderer->GetActiveCamera()->SetDistance(cameraFocalDistance);
     }
 }
 
@@ -578,6 +587,7 @@ void saveCameraSettingsToJSON(string path, saveJSONMode mode) {
         renderer->GetActiveCamera()->GetClippingRange(jsonConfigData.clippingRange);
         jsonConfigData.viewAngle = renderer->GetActiveCamera()->GetViewAngle();
         renderer->GetActiveCamera()->GetWindowCenter(jsonConfigData.windowCenter);
+        jsonConfigData.focalDistance = renderer->GetActiveCamera()->GetDistance();
         j = jsonConfigData;
         ofstream file(finalConfigFileName);
         file << j;

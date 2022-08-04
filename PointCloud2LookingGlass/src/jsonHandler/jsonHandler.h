@@ -25,6 +25,7 @@ namespace jsonHandler {
 		double clippingRange[2];
 		double windowCenter[2];
 		double viewAngle;
+		double focalDistance;
 
 		bool overrideEnable;
 		double overrideCameraPosition[3];

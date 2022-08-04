@@ -19,6 +19,7 @@ void jsonHandler::to_json(json& j, const jsonHandler::mediaConfig& mc) {
 			{"clippingRange", mc.clippingRange},
 			{"windowCenter", mc.windowCenter},
 			{"viewAngle", mc.viewAngle},
+			{"focalDistance", mc.focalDistance},
 			{"overrideEnable", mc.overrideEnable},
 			{"overrideCameraPosition", mc.overrideCameraPosition},
 			{"overrideViewUp", mc.overrideViewUp} };
@@ -33,6 +34,7 @@ void jsonHandler::from_json(const json& j, jsonHandler::mediaConfig& mc) {
 	j.at("clippingRange").get_to(mc.clippingRange);
 	j.at("windowCenter").get_to(mc.windowCenter);
 	j.at("viewAngle").get_to(mc.viewAngle);
+	j.at("focalDistance").get_to(mc.focalDistance);
 	j.at("overrideEnable").get_to(mc.overrideEnable);
 	j.at("overrideCameraPosition").get_to(mc.overrideCameraPosition);
 	j.at("overrideViewUp").get_to(mc.overrideViewUp);
