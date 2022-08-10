@@ -8,6 +8,7 @@
 namespace cameraHandler {
 
 	void cameraHandler(char*);
+	void realsenseBagFileReader(const char*);
 }
 
 

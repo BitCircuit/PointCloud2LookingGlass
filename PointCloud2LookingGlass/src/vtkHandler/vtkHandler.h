@@ -24,11 +24,13 @@
 #include "vtkAnimationScene.h"
 #include "vtkSmartPointer.h"
 #include "vtkDelaunay2D.h"
+#include "vtkCleanPolyData.h"
+#include "vtkNamedColors.h"
 
 namespace vtkHandler {
 
 	void vtkHandler(char**);
-	void dummyExperiment(const char*);
+	void dummyExperiment(char**);
 	void pclInterface(vtkPolyData*);
 	
 };

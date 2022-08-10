@@ -24,6 +24,7 @@
 #include "future"
 #include "ctime"
 #include "progressbar.hpp"
+#include "sys/stat.h"
 
 using namespace std;
 
@@ -43,6 +44,7 @@ namespace Util {
 	vector<string> scanFileByType(const char*, const char*);
 	bool findInPLY(const char*, findMode);
 	pathResult pathParser(const char*, const char*);
+	long getFileSize(const char*);
 };
 
 

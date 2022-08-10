@@ -82,3 +82,10 @@ Util::pathResult Util::pathParser(const char* path, const char* format) {
     free(info);
     return result;
 }
+
+// Return file size in Bytes
+long Util::getFileSize(const char* filename) {
+    struct stat stat_buf;
+    int rc = stat(filename, &stat_buf);
+    return rc == 0 ? stat_buf.st_size : -1;
+}

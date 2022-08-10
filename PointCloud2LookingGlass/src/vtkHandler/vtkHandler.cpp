@@ -29,6 +29,7 @@ void loadCameraSettingsFromJSON();
 void initializeConfig();
 void configHandler();
 void multithreadRequest();
+void interactiveStyle();
 
 namespace something {
     // Define interaction style
@@ -108,9 +109,10 @@ void interactorUsage() {
 
 }
 
-void vtkHandler::vtkHandler(char* path[]) {
-    programPath = Util::pathParser(path[0], ".exe");        // Just need the directory, for mac or linux, isFile should be false
-    mediaPath = Util::pathParser(path[1], ".ply");
+void vtkHandler::vtkHandler(char* argv[]) {
+    programPath = Util::pathParser(argv[0], ".exe");        // Just need the directory, for mac or linux, isFile should be false
+    if (strcmp(argv[1], "-v") == 0)     mediaPath = Util::pathParser(argv[2], ".ply");
+    else                                mediaPath = Util::pathParser(argv[1], ".ply");
 
     // To prevent user input processed file
     int tempLen = mediaPath.fileName.length();
@@ -118,7 +120,8 @@ void vtkHandler::vtkHandler(char* path[]) {
     if (mediaPath.isFile)    if (strcmp(tempChar, "meshed") == 0)     mediaPath.fileName.erase(tempLen - 6);
 
     generalPipeline();
-    //lookingGlassPipeline();
+    lookingGlassPipeline();
+    interactiveStyle();
     configHandler();
     
     reader->SetFileName(finalReaderPath.c_str());
@@ -373,6 +376,9 @@ void generalPipeline() {
     actor->SetMapper(mapper);
     renderer->AddActor(actor);
     renderWindow->AddRenderer(renderer);
+}
+
+void interactiveStyle() {
     style->renderer = renderer;
     style->renderWindow = renderWindow;
     iren->SetRenderWindow(renderWindow);
@@ -765,6 +771,67 @@ void multithreadRequest() {
     cout << endl;       // give a newline when bar.update reaches 100
 
 }
+
+void backupCodeDownsampleMesh(char**);
+
+void vtkHandler::dummyExperiment(char* argv[]) {
+    backupCodeDownsampleMesh(argv);
+}
+
+
+void backupCodeDownsampleMesh(char* argv[]) {
+    Util::pathResult temp = Util::pathParser(argv[1], ".ply");
+    string destFile = temp.directory + temp.fileName + "meshed.ply";
+
+    vtkNew<vtkPLYReader> localReader;
+    localReader->SetFileName(argv[1]);
+    localReader->Update();
+    cout << "Original File Size: " << Util::getFileSize(argv[1]) << " Bytes. " << endl;
+    cout << "Original File Polygon Num: " << localReader->GetOutput()->GetNumberOfPolys() << endl;
+    cout << "Original File Point Num: " << localReader->GetOutput()->GetNumberOfPoints() << endl;
+    vtkNew<vtkDelaunay2D> meshAlgo;
+    meshAlgo->SetInputData(localReader->GetOutput());
+    meshAlgo->SetAlpha(0.9);
+    meshAlgo->Update();
+    vtkNew<vtkPLYWriter> localWriter;
+    localWriter->SetFileName(destFile.c_str());
+    if (Util::findInPLY(argv[1], Util::alpha))   localWriter->SetArrayName("RGBA");
+    else localWriter->SetArrayName("RGB");
+    localWriter->SetInputConnection(meshAlgo->GetOutputPort());
+    localWriter->Write();
+
+    localReader->SetFileName(destFile.c_str());
+    localReader->Update();
+    cout << "Meshed File Size: " << Util::getFileSize(destFile.c_str()) << " Bytes. " << endl;
+    cout << "Meshed File Polygon Num: " << localReader->GetOutput()->GetNumberOfPolys() << endl;
+    cout << "Meshed File Point Num: " << localReader->GetOutput()->GetNumberOfPoints() << endl;
+
+    string destFile2 = temp.directory + temp.fileName + "downsampledMeshed.ply";
+    localReader->SetFileName(argv[1]);
+    localReader->Update();
+    vtkNew<vtkCleanPolyData> cleanPolyData;
+    cleanPolyData->SetInputData(localReader->GetOutput());
+    cleanPolyData->SetTolerance(0.01);
+    cleanPolyData->Update();
+    cout << "Downsampled Point Num: " << cleanPolyData->GetOutput()->GetNumberOfPoints() << endl;
+    //vtkNew<vtkDelaunay2D> meshAlgo;
+    meshAlgo->SetInputData(cleanPolyData->GetOutput());
+    meshAlgo->SetAlpha(0.5);
+    meshAlgo->Update();
+    //vtkNew<vtkPLYWriter> localWriter;
+    localWriter->SetFileName(destFile2.c_str());
+    if (Util::findInPLY(argv[1], Util::alpha))   localWriter->SetArrayName("RGBA");
+    else localWriter->SetArrayName("RGB");
+    localWriter->SetInputConnection(meshAlgo->GetOutputPort());
+    localWriter->Write();
+
+    localReader->SetFileName(destFile2.c_str());
+    localReader->Update();
+    cout << "Downsampled Meshed File Size: " << Util::getFileSize(destFile2.c_str()) << " Bytes. " << endl;
+    cout << "Downsampled Meshed File Polygon Num: " << localReader->GetOutput()->GetNumberOfPolys() << endl;
+    cout << "Downsampled Meshed File Point Num: " << localReader->GetOutput()->GetNumberOfPoints() << endl;
+}
+
 /*
 void threadOp(int i, vtkActor* newActor) {
     vtkNew<vtkPLYReader> readerVecMember;

@@ -332,4 +332,34 @@ could only generate point cloud without color information?
 - Re-cmake both library. 
 - While compiling PCL, compiler reported `boost` has x86 version, but x64 version of PCL is being built. 
 - After using `vcpkg` to install dependencies in 64 bit (set `VCPKG_DEFAULT_TRIPLET = x64-windows` in system variables), re-organized `PATH` environment, and rebuilt PCL in 64 bit. 
-- After test, PCL and VTK can work together. 
+- `pcl::VTKUtil::converttoVTK()` needs parameter of `pcl::Polygonmesh` type of data. It means the points data need to be meshed in PCL before transfer to VTK. Used tutorial code `Fast triangulation of unordered point clouds` to mesh a sample model. 
+- After test, PCL and VTK can work together.
+
+## Jul. 29, 2022
+- Tried 3D model captured by Intel RealSense Camera on the Light Field Display. Found out the main charactor is out of focus. 
+- Modified functions (interacting with keyboard, loading camera setting from JSON, and storing camera setting to JSON) to invoke `SetDistance()` API to move the focal point. 
+- Found out `SetWindowCenter()` API cannot move the model on live on the Light Field Display. (But the model is shown at the new position when it is reopened.) 
+
+## Aug. 2, 2022
+- Intel RealSense website provides wrappers for OpenNI2 library and PCL. The OpenNI2 wrapper is chosen since Kinect Azure camera also supports OpenNI2, which means OpenNI2 is a more common. (Reference: https://dev.intelrealsense.com/docs/openni-wrapper)
+- Followed the github instruction to build and compile drivers of realsense camera for OpenNI2. Run a sample program to test the driver works. 
+- Used benchmark code from https://pcl.readthedocs.io/projects/tutorials/en/latest/openni_grabber.html#openni-grabber to test. The code would print out the distance between center pixel to the object. The realsense is tested successfully. 
+- Trying to view realsense live signal from VTK. Converted data to VTK. The render window was not shown up. 
+
+## Aug. 3, 2022
+- Read concept of Intel Realsense D435i and Microsoft Kinect Azure. 
+- Intel RealSense Camera used IR projector to transmit IR light with certain pattern. Used Bio-inspired technology. The camera used two identical cameras on left and right (inpired by human eyes) to detect depth information (Stereoscopic Vision, with computer algorithm) and capture RGB images. 
+- Kinect Azure Camera used ToF technology to detect depth information. 
+
+## Aug. 4, 2022
+- Used code from https://stackoverflow.com/questions/5840148/how-can-i-get-a-files-size-in-c to get file size in Bytes (so to decide to downsample file(s) when its size exceed certain size). 
+- Followed sample code provided by VTK `DownsamplePointCloud` to add filter `vtkCleanPolyData` into pipeline (between PLYReader and meshAlgo). It was expected that this filter should downsample point cloud by certain parameter. However, the vtk poped error while writing to PLY file. States that there is no data to write. 
+- Used `cout` command to print point number of vtkCleanPolyData. It showed 0 points. Same result with different parameters (tolrance = 0.01, 0.1, 0.5, 0.9).
+- Maybe implement downsample and mesh feature from PCL?
+- While following `DownsamplePointCloud` code, found out that VTK can show point cloud directly (without meshing). Just set point size from actor. However, after testing, the render windows still shows blank. 
+- After trying a PLY embedded with face element (random thought), the downsampling filter works. 
+- From information printed, the generated files does not have any face element. Maybe the points are reduced, and the mesh algo's parameter becomes too small. 
+
+## Aug. 9, 2022
+- Found problem: The window center is not controllable when the looking glass pipeline is connected. -> The scene cannot be moved up, down, left, right. However, other control commands still work. 
+- 
