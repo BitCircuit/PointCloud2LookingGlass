@@ -16,30 +16,21 @@
 - Version: 0.2.0
 - Closed Source License: Looking Glass Factory Inc. 
 
-
-## Microsoft Azure Kinect SDK
-- URL: https://docs.microsoft.com/en-us/azure/kinect-dk/
-- MIT License
-- Version: 1.4.1
-### Depth Engine (Windows and Debian Linux)
-- Version: 2.0
-- Closed Source
-
 ## Point Cloud Library
+- URL: https://github.com/PointCloudLibrary/pcl
+- BSD License
+- Version: nightly build
+- Source Version: 1.12.1
 
-## OpenNI
-
-## Rapid JSON
-- URL: http://rapidjson.org/
-- MIT License
-- Version: 1.1.0
-- Mandatory Dependencies: CMake
+## OpenNI 2
+- URL: https://structure.io/openni
+- Apache-2.0 License
+- Version: 2.2.0.33 Beta (x64)
 
 ## JSON for Modern C++
 - URL: https://github.com/nlohmann/json
 - MIT License
 - Version: 3.10.5
-- 
 
 ## Progress Bar
 - URL: https://github.com/gipert/progressbar
