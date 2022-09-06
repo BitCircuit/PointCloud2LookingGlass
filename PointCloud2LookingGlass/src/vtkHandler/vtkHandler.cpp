@@ -106,7 +106,17 @@ time_t result = time(nullptr);
 
 void interactorUsage() {
     printf("----------Interactor Usage----------\n");
-
+    printf("Use arrow keys to rotate: Up & Down (Vertically) and Left & Right (Horizontally)\n");
+    printf("Use WASD to move: W & S (Vertically) and A & D (Horizontally)\n");
+    printf("i - Zoom [I]n\n");
+    printf("o - Zoom [O]ut\n");
+    printf("c - Switch between [C]lipping planes and focal plane\n");
+    printf("l - Move selected plane closer\n");
+    printf("p - Move selected plane further\n");
+    printf("f - Overwrite default configeration values in camera pro[F]ile\n");
+    printf("r - [R]eset prospective\n");
+    printf("q - [Q]uit\n");
+    printf("------------------------------------\n");
 }
 
 void vtkHandler::vtkHandler(char* argv[]) {
@@ -127,6 +137,8 @@ void vtkHandler::vtkHandler(char* argv[]) {
     reader->SetFileName(finalReaderPath.c_str());
     reader->Update();
     loadCameraSettingsFromJSON();   // camera == camera values (for interactor) == struct
+
+    interactorUsage();
 
     if (mediaPath.isFile)           singlePLYPlot();
     else {
