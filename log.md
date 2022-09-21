@@ -43,16 +43,10 @@
 - Since the online code is using integer array to calculate mantissa, exponent and sign parts of IEEE-754, bitwise operation is used to convert the hex value to integer array. 
 
 ## Jun. 19, 2022
-- (Writing body part)---------------------
 - Used `printf` to output first 50 columns of data, and compared with dataset in `Matlab`.
 - The program stopped suddenly. 
 - Searched online. Used `feof` and `ferror` to check for problems. 
 Found out when program reads `0x1A` (same as ctrl+z in ASCII) would trigger EOF (End of File) signal. Changed `fopen` mode from `r` to `rb+` (as `Reading Binary`).
-
-- Completed:
-- - PLY file decoder is able to read simple PLY file (based on samples I have)
-- Made progress:
-- - Studying HoloPlay SDK; 10% complete
 
 ## Jun. 20, 2022
 - Made progress:
@@ -97,9 +91,6 @@ Found out when program reads `0x1A` (same as ctrl+z in ASCII) would trigger EOF 
 
 ## Jul. 1, 2022
 - After meeting, professors suggest the problem I have encountered with is the memory leakage. Tried public APIs in `renderWindow` module. 
-
-
-
 
 - Completed:
 - - Fixed screen frozen problem by calling `renderWindow->Finalize()`
