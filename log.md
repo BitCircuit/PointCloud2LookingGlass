@@ -362,4 +362,26 @@ could only generate point cloud without color information?
 
 ## Aug. 9, 2022
 - Found problem: The window center is not controllable when the looking glass pipeline is connected. -> The scene cannot be moved up, down, left, right. However, other control commands still work. 
-- 
+
+## Aug. 19, 2022
+- Try to use Unity to create external program for showing the live signal
+- Download Unity packages from Looking Glass and Intel websites
+- Create a 3D project
+- Assets -> import package -> custom package
+- Import both packages
+- In RealSenseSDK2.0 assets:
+> 1. Direct to Scenes -> Samples -> PointCloudDepthAndColor.unity (Double click to open)
+> 2. Select `RsDevice` & `RsProcessingPipe` and copy them
+
+- In Holoplay assets:
+> 1. Direct to Examples -> 2 - Placing Text.unity (Double click to open)
+> 2. Delete original content in Scene -> Canvas
+> 3. Paste `RsDevice` & `RsProcessingPipe` in Canvas
+
+- Change parameters for `RsDevice`:
+> 1. Rotation Z: 90
+> 2. Scale: X - 20, Y - 20, Z - 1
+> 3. Others are default
+
+- Change parameters for `Holoplay Capture`:
+> Camera Data: Size - 10, Far Clip Factor - 2, Field of View - 5, others are default
