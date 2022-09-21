@@ -33,10 +33,6 @@
 >> Since `end_header` has length of 10 chars. Therefore, use 12 chars (add two more chars for extra little space to prevent leak) to define `header1` array.  
 >> Same for `header2` array, since `binary_little_endian` has length of 20 chars. Add two more chars for extra spaces. So `header2` has length of 22 chars.  
 >> Assume the length of `header3`~`header5` would not exceed 20 chars. So they have length of 20 chars each.  
->
-> Body:
-
-
 
 - If the hex binary were recorded in little endian, convert to big endian first. 
 - Since the file uses binary to record float numbers, some code were copied from https://www.geeksforgeeks.org/program-for-conversion-of-32-bits-single-precision-ieee-754-floating-point-representation/ to perform IEEE-754 floating point algorithm. 
@@ -246,7 +242,7 @@ could only generate point cloud without color information?
 > 1. Modify and integrate sample code `Delaunay2D`. The face is generated and the 3D model is plotted on the window. Problem: If there are multiple objects in the file, and their depth information have significant difference, this algorithm still connects them together. 
 > 2. Based on API of `vtkDelaunay2D`. Setting Alpha (max distance) should solve the problem from point 1. 
 >> a. After testing, setting Alpha to 0.075 has a good result to the sample I tested. And assume it would be a general result for all. Smaller number may result in discrete points near object's edge. Larger number may result in everything connects together. 
->> b. Found another API which sets tolerance. After testing, it would affect the surface smooth. If the tolerance too large, the object has low details (i.e. facial features may not be recognized). If the tolerance too small, the object surface may become uneven. I believe that recognizing facial features has higher priority on this matter. Best result is to comment out the command and leave it as default. :joy:  
+>> b. Found another API which sets tolerance. After testing, it would affect the surface smooth. If the tolerance too large, the object has low details (i.e. facial features may not be recognized). If the tolerance too small, the object surface may become uneven. I believe that recognizing facial features has higher priority on this matter. Best result is to comment out the command and leave it as default. 
 >
 > 3. Make it as a seperate method, which can be called from the beginning of other methods. Note: the face construction takes long time to compute. Save the meshed file(s), set a flag in JSON, and load meshed result next time directly. 
 > 4. After testing, `vtkPLYWriter` does not write color information by default. Need to dig into reader or mapper to get color map. 
