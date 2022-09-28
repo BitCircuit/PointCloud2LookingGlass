@@ -143,13 +143,11 @@ void vtkHandler::vtkHandler(char* argv[]) {
     if (mediaPath.isFile)           singlePLYPlot();
     else {
         if (newConfigCreated) {
-            singlePLYPlot();
+            singlePLYPlot();        // User changes zoom in/ clipping range on the first frame, then reload the video folder and play in normal mode
             saveCameraSettingsToJSON(finalConfigFileName, saveJSONMode::config);
         }
-        else {
-            loadCameraSettingsFromJSON();
-            showVideo(jsonConfigData.FPS);
-        }
+        loadCameraSettingsFromJSON();
+        showVideo(jsonConfigData.FPS);
     }
     saveCameraSettingsToJSON(finalConfigFileName, saveJSONMode::config);
     if(newProfileCreated)   saveCameraSettingsToJSON(finalProfileName, profile);
@@ -338,7 +336,7 @@ void something::KeyPressInteractorStyle::OnKeyPress() {
         jsonConfigData.overrideEnable = false;
     }
 
-    if (key == "r") {
+    if (key == "r") {  //TODO: Change 100, 001 to values before sample is loaded
         renderer->GetActiveCamera()->SetPosition(1, 0, 0);
         renderer->GetActiveCamera()->SetViewUp(0, 0, 1);
         renderer->ResetCamera();
